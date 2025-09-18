@@ -1,0 +1,179 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import logo1 from "../assets/logo1.png";
+import google from "../assets/google.jpg";
+import { FaRegEye } from "react-icons/fa6";
+import { FaRegEyeSlash } from "react-icons/fa6";
+import axios from "axios"
+import {serverUrl} from "../App"
+import { toast } from "react-toastify";
+import ClipLoader from "react-spinners/ClipLoader";
+
+
+function SignUp() {
+  const [show, setShow] = useState(false);
+  const navigate = useNavigate();
+  const [name , setName] = useState("");
+  const [email , setEmail] = useState("")
+  const [password , setPassword] = useState("")
+  const [role , setRole] = useState("student")
+  const [loading , setLoading] = useState(false)
+
+  const handleSignup = async () =>{
+    setLoading(true)
+    try {
+      const result = await axios.post(serverUrl + "/api/auth/signup" ,
+        {name , password , email ,role},
+        {withCredentials : true})
+
+        console.log(result.data)
+        navigate("/")
+        toast.success("Signup Successfully");
+        setLoading(false)
+    } catch (error) {
+      console.log(error)
+      setLoading(false)
+      toast.error(error.response.data.message)
+    }
+  }
+
+  return (
+    <div className="bg-[#dddbdb] w-[100vw] h-[100vh] flex items-center justify-center">
+      <form
+        className="w-[90%] md:w-200 h-150 bg-[white] shadow-xl
+      rounded-2xl flex"
+      onSubmit={(e)=>{e.preventDefault()}}
+      >
+        {/* left div */}
+        <div className="md:w-[50%] w-[100%] h-[100%] flex flex-col items-center justify-center gap-3">
+          <div className="w-[170px] h-[60px] rounded-lg overflow-hidden lg:hidden">
+            <img src={logo1} alt="logo" className="w-full h-full " />
+          </div>
+
+          <div>
+            <h1 className="font-semibold text-black text-2xl">
+              {" "}
+              let's get started
+            </h1>
+
+            <h2 className=" text-gray-500 text-[18px]">Create your account</h2>
+          </div>
+
+          {/* main form  */}
+          <div className="flex flex-col gap-1 w-[80%] items-start justify-center px-3 relative">
+            <label htmlFor="name" className="font-semibold">
+              Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              className="border-1 w-[100%] h-[35px]
+             border-[#e7e6e6] text-[15px] px-[20px]"
+              placeholder="Your Name"
+              onChange={(e)=>setName(e.target.value)}
+              value={name}
+            />
+
+            <label htmlFor="email" className="font-semibold">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              className="border-1 w-[100%] h-[35px]
+             border-[#e7e6e6] text-[15px] px-[20px]"
+              placeholder="Your Email"
+              onChange={(e)=>setEmail(e.target.value)}
+              value={email}
+            />
+
+            <label htmlFor="password" className="font-semibold">
+              Password
+            </label>
+            <input
+              id="password"
+              type={show ? "text" : "password"}
+              className="border-1 w-[100%] h-[35px]
+             border-[#e7e6e6] text-[15px] px-[20px]"
+              placeholder="Password"
+              onChange={(e)=>setPassword(e.target.value)}
+              value={password}
+            />
+            {show ? (
+              <FaRegEye
+                className="absolute w-[20px] h-[20px] cursor-pointer right-[6%] bottom-[4%]"
+                onClick={() => setShow((prev) => !prev)}
+              />
+            ) : (
+              <FaRegEyeSlash
+                className="absolute w-[20px] h-[20px] cursor-pointer right-[6%] bottom-[4%]"
+                onClick={() => setShow((prev) => !prev)}
+              />
+            )}
+          </div>
+
+          <div className="flex md:w-[50%] w-[70%] items-center justify-between">
+            <span
+              className={`px-[10px] py-[5px] border-[2px] border-[#e7e6e6] rounded-xl cursor-pointer
+                hover:border-black ${role === "student" ? "border-black" : "border-[#646464]"}`}
+                onClick={()=>setRole("student")}
+            >
+              Student
+            </span>
+
+            <span
+              className={`px-[10px] py-[5px] border-[2px] border-[#e7e6e6] rounded-xl cursor-pointer
+                hover:border-black ${role === "educator" ? "border-black" : "border-[#646464]"}`}
+                onClick={()=>setRole("educator")}
+            >
+              Educator
+            </span>
+          </div>
+
+          <button
+            className="w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center
+          justify-center rounded-[10px] "
+          disabled = {loading} 
+          onClick={handleSignup}
+          >
+            {loading ? <ClipLoader size={30} color="white" /> : "Signup"}
+          </button>
+
+          <div className="w-[80%] flex items-center gap-2">
+            <div className="w-[25%] h-[0.5px] bg-[#c4c4c4]"></div>
+            <div className="w-[50%] text-[15px] text-[#6f6f6f] flex items-center justify-center">
+              Or continue
+            </div>
+            <div className="w-[25%] h-[0.5px] bg-[#c4c4c4]"></div>
+          </div>
+
+          <div
+            className="w-[80%] h-[40px] border-1 border-[black] rounded-[5px] flex items-center
+          justify-center"
+          >
+            <img src={google} alt="" className="w-[25px]" />
+            <span className="text-[18px] text-gray-500">oogle</span>
+          </div>
+
+          <div className="text-[#6f6f6f]">
+            Already have an account?
+            <span 
+            className="underline underline-offset-1 cursor-pointer"
+            onClick={()=>navigate("/login")}
+            > Login </span>
+          </div>
+        </div>
+
+        {/* right div */}
+        <div
+          className="w-[50%] h-[100%] rounded-2xl bg-[black] md:flex items-center justify-center
+        flex-col hidden"
+        >
+          <img src={logo1} alt="logo" className="w-90 shadow-2xl" />
+        </div>
+      </form>
+    </div>
+  );
+}
+
+export default SignUp;
