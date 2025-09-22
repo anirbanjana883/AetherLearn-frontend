@@ -19,7 +19,7 @@ function Nav() {
 
   const handleLogOut = async () => {
     try {
-      const result = axios.get(serverUrl + "/api/auth/login", {
+      const result =await axios.get(serverUrl + "/api/auth/logout", {
         withCredentials: true,
       });
       dispatch(setUserData(null));
@@ -96,20 +96,21 @@ function Nav() {
           {show && (
             <div
               className="absolute top-[110%] right-[15%] flex flex-col items-center justify-center
-     gap-3 text-[16px] rounded-lg bg-white px-4 py-3 border-2 border-black
-     shadow-lg cursor-pointer transition-all duration-300
-     hover:border-gray-300 hover:bg-gray-100"
+    gap-3 text-[16px] rounded-lg bg-white px-4 py-3 border-2 border-black
+    shadow-lg transition-all duration-300
+    hover:border-gray-300 hover:bg-gray-100"
             >
               <span
                 className="bg-black text-white px-6 py-2 rounded-2xl font-medium shadow-sm
-               hover:bg-gray-700 transition-colors duration-300"
+      hover:bg-gray-700 transition-colors duration-300 cursor-pointer"
+                onClick={() => navigate("/profile")}
               >
                 My Profile
               </span>
 
               <span
                 className="bg-black text-white px-6 py-2 rounded-2xl font-medium shadow-sm
-               hover:bg-gray-700 transition-colors duration-300"
+      hover:bg-gray-700 transition-colors duration-300 cursor-pointer"
               >
                 My Courses
               </span>
@@ -121,6 +122,8 @@ function Nav() {
           className="w-[35px] h-[35px] lg:hidden fill-black cursor-pointer"
           onClick={() => setShowHam((prev) => !prev)}
         />
+
+        {/* $$$$$$$$$$$$$$$$$$$  mobile version $$$$$$$$$$$$$$$$$$$$$$$ */}
 
         {/* left slider menu  when clcked on hamberger*/}
         <div
@@ -160,6 +163,7 @@ function Nav() {
             className="w-[200px] h-[65px] border-2 border-white
                   bg-[black] flex items-center justify-center 
                    text-white rounded-[10px] text-[18px] font-light cursor-pointer"
+            onClick={() => navigate("/profile")}
           >
             My Profile
           </div>

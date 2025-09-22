@@ -37,7 +37,7 @@ function SignUp() {
     } catch (error) {
       console.log(error)
       setLoading(false)
-      toast.error(error.response.data.message)
+      toast.error(error.response.data.message || "Signup failed")
     }
   }
 
@@ -74,6 +74,7 @@ function SignUp() {
               className="border-1 w-[100%] h-[35px]
              border-[#e7e6e6] text-[15px] px-[20px]"
               placeholder="Your Name"
+              required
               onChange={(e)=>setName(e.target.value)}
               value={name}
             />
@@ -87,6 +88,7 @@ function SignUp() {
               className="border-1 w-[100%] h-[35px]
              border-[#e7e6e6] text-[15px] px-[20px]"
               placeholder="Your Email"
+              required
               onChange={(e)=>setEmail(e.target.value)}
               value={email}
             />
@@ -100,6 +102,7 @@ function SignUp() {
               className="border-1 w-[100%] h-[35px]
              border-[#e7e6e6] text-[15px] px-[20px]"
               placeholder="Password"
+              required
               onChange={(e)=>setPassword(e.target.value)}
               value={password}
             />

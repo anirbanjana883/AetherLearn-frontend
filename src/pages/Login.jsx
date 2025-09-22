@@ -4,7 +4,7 @@ import google from "../assets/google.jpg";
 import { FaRegEye } from "react-icons/fa6";
 import { FaRegEyeSlash } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"
+import axios from "axios";
 import { serverUrl } from "../App";
 import ClipLoader from "react-spinners/ClipLoader";
 import { toast } from "react-toastify";
@@ -13,35 +13,47 @@ import { setUserData } from "../redux/userSlice";
 
 function Login() {
   const [show, setShow] = useState(false);
-  const [email , setEmail] = useState("")
-  const [password , setPassword] = useState("")
-  const [loading , setLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const handleLogin = async ()=>{
-    setLoading(true)
+  const handleLogin = async () => {
+    setLoading(true);
     try {
-      const result = await  axios.post(serverUrl + "/api/auth/login",
-        {email , password},
-        {withCredentials:true}
-      )
-      setLoading(false)
-      dispatch(setUserData(result.data))
+      const result = await axios.post(
+        serverUrl + "/api/auth/login",
+        { email, password },
+        { withCredentials: true }
+      );
+      setLoading(false);
+      dispatch(setUserData(result.data));
       toast.success("Login Successfully");
-      navigate("/")
+      navigate("/");
     } catch (error) {
-      console.log(error)
-      setLoading(false)
-      toast.error(error.response.data.message)
+      // Handle Axios error properly
+      if (error.response) {
+        // Backend responded with error (400, 401, etc.)
+        toast.error(error.response.data.message || "Login failed");
+      } else if (error.request) {
+        // No response from server
+        toast.error("No response from server. Please try again.");
+      } else {
+        // Other errors
+        toast.error("Error: " + error.message);
+      }
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
   return (
     <div className="bg-[#dddbdb] w-[100vw] h-[100vh] flex items-center justify-center">
       <form
         className="w-[90%] md:w-200 h-150 bg-[white] shadow-xl
           rounded-2xl flex"
-          onSubmit={(e)=>e.preventDefault()}
+        onSubmit={(e) => e.preventDefault()}
       >
         {/* left div */}
         <div className="md:w-[50%] w-[100%] h-[100%] flex flex-col items-center justify-center gap-3">
@@ -69,7 +81,8 @@ function Login() {
               className="border-1 w-[100%] h-[35px]
                  border-[#e7e6e6] text-[15px] px-[20px]"
               placeholder="Your Email"
-              onChange={(e)=>setEmail(e.target.value)}
+              required
+              onChange={(e) => setEmail(e.target.value)}
               value={email}
             />
 
@@ -82,7 +95,8 @@ function Login() {
               className="border-1 w-[100%] h-[35px]
                  border-[#e7e6e6] text-[15px] px-[20px]"
               placeholder="Password"
-              onChange={(e)=>setPassword(e.target.value)}
+              required
+              onChange={(e) => setPassword(e.target.value)}
               value={password}
             />
             {show ? (
@@ -101,13 +115,18 @@ function Login() {
           <button
             className="w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center
               justify-center rounded-[10px] "
-              disabled = {loading} 
-              onClick={handleLogin}
+            disabled={loading}
+            onClick={handleLogin}
           >
-            {loading ? <ClipLoader size={30} color="white"/> : "Login"}
+            {loading ? <ClipLoader size={30} color="white" /> : "Login"}
           </button>
 
-          <span className="text-[16px] cursor-pointer text-[#585757]">Forgot your Password ?</span>
+          <span
+            className="text-[16px] cursor-pointer text-[#585757]"
+            onClick={() => navigate("/forget")}
+          >
+            Forgot your Password ?
+          </span>
 
           <div className="w-[80%] flex items-center gap-2">
             <div className="w-[25%] h-[0.5px] bg-[#c4c4c4]"></div>
@@ -127,13 +146,14 @@ function Login() {
 
           <div className="text-[#6f6f6f]">
             Don't have an account ?
-            <span 
-            className="underline underline-offset-1 cursor-pointer"
-            onClick={()=>navigate("/signup")}
-            > Signup </span>
+            <span
+              className="underline underline-offset-1 cursor-pointer"
+              onClick={() => navigate("/signup")}
+            >
+              {" "}
+              Signup{" "}
+            </span>
           </div>
-
-
         </div>
 
         {/* right div */}
