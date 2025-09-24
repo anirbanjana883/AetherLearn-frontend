@@ -119,7 +119,7 @@ function Nav() {
         </div>
         {/* hambarger */}
         <GiHamburgerMenu
-          className="w-[35px] h-[35px] lg:hidden fill-black cursor-pointer"
+          className="w-[35px] h-[35px] lg:hidden fill-white cursor-pointer"
           onClick={() => setShowHam((prev) => !prev)}
         />
 
