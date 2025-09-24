@@ -10,6 +10,8 @@ import { toast } from "react-toastify";
 import ClipLoader from "react-spinners/ClipLoader";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../../utils/firebase";
 
 
 function SignUp() {
@@ -22,7 +24,9 @@ function SignUp() {
   const [loading , setLoading] = useState(false)
   const dispatch = useDispatch()
 
-  const handleSignup = async () =>{
+  const handleSignup = async (e) =>{
+    e.preventDefault();
+    console.log("Form submitted");
     setLoading(true)
     try {
       const result = await axios.post(serverUrl + "/api/auth/signup" ,
@@ -32,12 +36,35 @@ function SignUp() {
 
         console.log(result.data)
         navigate("/")
+        toast.success("Signup Successfully");      
+    } catch (error) {
+      console.log(error)      
+      toast.error(error.response.data.message || "Signup failed")
+    }finally{
+      setLoading(false)
+    }
+  }
+
+  const googleSignUp = async ()=>{
+    try {
+      const response = await signInWithPopup(auth,provider)
+      // console.log(response)
+      let user = response.user
+      let name = user.displayName
+      let email = user.email
+
+      const result = await axios.post(serverUrl + "/api/auth/googleauth",
+        {name,email,role},
+        {withCredentials : true}
+      )
+      dispatch(setUserData(result.data))
+
+        console.log(result.data)
+        navigate("/")
         toast.success("Signup Successfully");
-        setLoading(false)
     } catch (error) {
       console.log(error)
-      setLoading(false)
-      toast.error(error.response.data.message || "Signup failed")
+      toast.error(error.response?.data?.message || "Signup failed")
     }
   }
 
@@ -46,7 +73,7 @@ function SignUp() {
       <form
         className="w-[90%] md:w-200 h-150 bg-[white] shadow-xl
       rounded-2xl flex"
-      onSubmit={(e)=>{e.preventDefault()}}
+      onSubmit={handleSignup}
       >
         {/* left div */}
         <div className="md:w-[50%] w-[100%] h-[100%] flex flex-col items-center justify-center gap-3">
@@ -96,6 +123,7 @@ function SignUp() {
             <label htmlFor="password" className="font-semibold">
               Password
             </label>
+            <div className="relative w-full">
             <input
               id="password"
               type={show ? "text" : "password"}
@@ -108,15 +136,16 @@ function SignUp() {
             />
             {show ? (
               <FaRegEye
-                className="absolute w-[20px] h-[20px] cursor-pointer right-[6%] bottom-[4%]"
+                className="absolute w-[20px] h-[20px] cursor-pointer right-[6%] top-1/2 -translate-y-1/2"
                 onClick={() => setShow((prev) => !prev)}
               />
             ) : (
               <FaRegEyeSlash
-                className="absolute w-[20px] h-[20px] cursor-pointer right-[6%] bottom-[4%]"
+                className="absolute w-[20px] h-[20px] cursor-pointer right-[6%] top-1/2 -translate-y-1/2"
                 onClick={() => setShow((prev) => !prev)}
               />
             )}
+            </div>
           </div>
 
           <div className="flex md:w-[50%] w-[70%] items-center justify-between">
@@ -138,10 +167,10 @@ function SignUp() {
           </div>
 
           <button
+          type="submit"
             className="w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center
           justify-center rounded-[10px] "
           disabled = {loading} 
-          onClick={handleSignup}
           >
             {loading ? <ClipLoader size={30} color="white" /> : "Signup"}
           </button>
@@ -156,7 +185,8 @@ function SignUp() {
 
           <div
             className="w-[80%] h-[40px] border-1 border-[black] rounded-[5px] flex items-center
-          justify-center"
+          justify-center cursor-pointer"
+              onClick={googleSignUp}
           >
             <img src={google} alt="" className="w-[25px]" />
             <span className="text-[18px] text-gray-500">oogle</span>

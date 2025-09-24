@@ -10,6 +10,8 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../../utils/firebase";
 
 function Login() {
   const [show, setShow] = useState(false);
@@ -48,12 +50,42 @@ function Login() {
     }
   };
 
+  // login with google
+  const googleLogin = async ()=>{
+    try {
+      const response = await signInWithPopup(auth,provider)
+      // console.log(response)
+      let user = response.user
+      let name = user.displayName
+      let email = user.email
+      let role = "" // no need of role in login
+
+      const result = await axios.post(serverUrl + "/api/auth/googleauth",
+        {name,email,role},
+        {withCredentials : true}
+      )
+      dispatch(setUserData(result.data))
+
+        console.log(result.data)
+        navigate("/")
+        toast.success("Login Successfully");
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.response?.data?.message || error.message || "Login failed");
+
+    }
+  }
+
   return (
     <div className="bg-[#dddbdb] w-[100vw] h-[100vh] flex items-center justify-center">
       <form
         className="w-[90%] md:w-200 h-150 bg-[white] shadow-xl
           rounded-2xl flex"
-        onSubmit={(e) => e.preventDefault()}
+          onSubmit={(e) => { 
+            e.preventDefault();
+             handleLogin(); 
+            }}
+
       >
         {/* left div */}
         <div className="md:w-[50%] w-[100%] h-[100%] flex flex-col items-center justify-center gap-3">
@@ -89,6 +121,7 @@ function Login() {
             <label htmlFor="password" className="font-semibold">
               Password
             </label>
+            <div className="relative w-full">
             <input
               id="password"
               type={show ? "text" : "password"}
@@ -101,22 +134,23 @@ function Login() {
             />
             {show ? (
               <FaRegEye
-                className="absolute w-[20px] h-[20px] cursor-pointer right-[6%] bottom-[4%]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-[20px] h-[20px] cursor-pointer"
                 onClick={() => setShow((prev) => !prev)}
               />
             ) : (
               <FaRegEyeSlash
-                className="absolute w-[20px] h-[20px] cursor-pointer right-[6%] bottom-[4%]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-[20px] h-[20px] cursor-pointer"
                 onClick={() => setShow((prev) => !prev)}
               />
             )}
+            </div>
           </div>
 
           <button
             className="w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center
               justify-center rounded-[10px] "
             disabled={loading}
-            onClick={handleLogin}
+            type="submit"
           >
             {loading ? <ClipLoader size={30} color="white" /> : "Login"}
           </button>
@@ -138,7 +172,8 @@ function Login() {
 
           <div
             className="w-[80%] h-[40px] border-1 border-[black] rounded-[5px] flex items-center
-              justify-center"
+              justify-center cursor-pointer"
+              onClick={googleLogin}
           >
             <img src={google} alt="" className="w-[25px]" />
             <span className="text-[18px] text-gray-500">oogle</span>
