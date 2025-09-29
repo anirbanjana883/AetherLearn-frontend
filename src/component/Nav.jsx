@@ -19,7 +19,7 @@ function Nav() {
 
   const handleLogOut = async () => {
     try {
-      const result =await axios.get(serverUrl + "/api/auth/logout", {
+      const result = await axios.get(serverUrl + "/api/auth/logout", {
         withCredentials: true,
       });
       dispatch(setUserData(null));
@@ -50,16 +50,25 @@ function Nav() {
         <div className="w-[30%] lg:flex items-center justify-center gap-4 hidden">
           {/* profile image / default icon */}
           {userData ? (
-            <div
-              className="w-[50px] h-[50px] rounded-full text-white flex items-center justify-center text-[20px]
-    border-2 bg-black border-white cursor-pointer"
-              onClick={() => setShow((prev) => !prev)}
-            >
-              {userData?.name.slice(0, 1).toUpperCase()}
-            </div>
+            userData.photoUrl ? (
+              <img
+                src={userData.photoUrl}
+                alt="profile"
+                className="w-[50px] h-[50px] rounded-full object-cover cursor-pointer"
+                onClick={() => setShow((prev) => !prev)}
+              />
+            ) : (
+              <div
+                className="w-[50px] h-[50px] rounded-full text-white flex items-center justify-center text-[20px]
+      border-2 bg-black border-white cursor-pointer"
+                onClick={() => setShow((prev) => !prev)}
+              >
+                {userData?.name.slice(0, 1).toUpperCase()}
+              </div>
+            )
           ) : (
             <IoPersonCircleSharp
-              className="w-[50px] h-[50px] fill-black cursor-pointer"
+              className="w-[50px] h-[50px] fill-white cursor-pointer"
               onClick={() => setShow((prev) => !prev)}
             />
           )}
@@ -143,17 +152,23 @@ function Nav() {
           >
             {/* profile image / default icon */}
             {userData ? (
-              <div
-                className="w-[50px] h-[50px] rounded-full text-white flex items-center justify-center text-[20px]
-    border-2 bg-black border-white cursor-pointer"
-              >
-                {userData?.name.slice(0, 1).toUpperCase()}
-              </div>
+              userData.photoUrl ? (
+                <img
+                  src={userData.photoUrl}
+                  alt="profile"
+                  className="w-[50px] h-[50px] rounded-full object-cover cursor-pointer border-2 border-white"
+                />
+              ) : (
+                <div
+                  className="w-[50px] h-[50px] rounded-full text-white flex items-center justify-center text-[20px]
+      border-2 bg-black border-white cursor-pointer"
+                  onClick={() => setShow((prev) => !prev)}
+                >
+                  {userData?.name.slice(0, 1).toUpperCase()}
+                </div>
+              )
             ) : (
-              <IoPersonCircleSharp
-                className="w-[50px] h-[50px] fill-white cursor-pointer"
-                onClick={() => setShow((prev) => !prev)}
-              />
+              <IoPersonCircleSharp className="w-[50px] h-[50px] fill-white cursor-pointer" />
             )}
           </div>
 
