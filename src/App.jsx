@@ -9,11 +9,16 @@ import { useSelector } from 'react-redux'
 import Profile from './pages/Profile'
 import ForgetPassowrd from './pages/ForgetPassowrd'
 import EditProfile from './pages/EditProfile'
+import Dashboard from './pages/Educator/Dashboard'
+import Courses from './pages/Educator/Courses'
+import CreateCourses from './pages/Educator/CreateCourses'
+import getCreatorCourse from './customHooks/getCreatorCourse'
 
 export const serverUrl = "http://localhost:8000"
 
 function App() {
   getCurrentUser()
+  getCreatorCourse()
   const {userData} = useSelector(state=>state.user);
 
   return (
@@ -26,6 +31,11 @@ function App() {
             <Route path='/profile' element={userData ? <Profile/> : <Navigate to={"/login"}/>}/>
             <Route path='/forget' element={!userData ? <ForgetPassowrd/> : <Navigate to="/"/>}/>
             <Route path='/editprofile' element={userData ? <EditProfile/> : <Navigate to="/login"/>}/>
+
+            {/* educator */}
+            <Route path='/dashboard' element={userData?.role === "educator" ? <Dashboard/> : <Navigate to="/"/>}/>
+            <Route path='/courses' element={userData?.role === "educator" ? <Courses/> : <Navigate to="/"/>}/>
+            <Route path='/createcourse' element={userData?.role === "educator" ? <CreateCourses/> : <Navigate to="/"/>}/>
         </Routes>
     </>
   )

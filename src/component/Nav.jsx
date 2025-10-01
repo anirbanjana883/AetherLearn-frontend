@@ -77,6 +77,7 @@ function Nav() {
             <div
               className="px-[20px] py-[10px] border-2 border-white
                   bg-[black] text-white rounded-[10px] text-[18px] font-light cursor-pointer"
+                  onClick={()=>{navigate("/dashboard")}}
             >
               Dashboard
             </div>
@@ -196,6 +197,7 @@ function Nav() {
               className="w-[200px] h-[65px] border-2 border-white
                   bg-[black] flex items-center justify-center 
                    text-white rounded-[10px] text-[18px] font-light cursor-pointer"
+                   onClick={()=>{navigate("/dashboard")}}
             >
               Dashboard
             </div>
