@@ -11,14 +11,17 @@ import ForgetPassowrd from './pages/ForgetPassowrd'
 import EditProfile from './pages/EditProfile'
 import Dashboard from './pages/Educator/Dashboard'
 import Courses from './pages/Educator/Courses'
+import EditCourse from './pages/Educator/EditCourse'
 import CreateCourses from './pages/Educator/CreateCourses'
 import getCreatorCourse from './customHooks/getCreatorCourse'
+import getPublishedCourse from './customHooks/getPublishedCourse'
 
 export const serverUrl = "http://localhost:8000"
 
 function App() {
   getCurrentUser()
   getCreatorCourse()
+  getPublishedCourse()
   const {userData} = useSelector(state=>state.user);
 
   return (
@@ -36,6 +39,7 @@ function App() {
             <Route path='/dashboard' element={userData?.role === "educator" ? <Dashboard/> : <Navigate to="/"/>}/>
             <Route path='/courses' element={userData?.role === "educator" ? <Courses/> : <Navigate to="/"/>}/>
             <Route path='/createcourse' element={userData?.role === "educator" ? <CreateCourses/> : <Navigate to="/"/>}/>
+            <Route path='/editcourse/:courseId' element={userData?.role === "educator" ? <EditCourse/> : <Navigate to="/"/>}/>
         </Routes>
     </>
   )

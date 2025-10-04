@@ -1,13 +1,34 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import img from "../../assets/empty.jpg";
 import { FaEdit } from "react-icons/fa";
+import getCreatorCourse from "../../customHooks/getCreatorCourse";
+import axios from "axios";
+import { serverUrl } from "../../App";
+import { setCreatorCourseData } from "../../redux/courseSlice";
 
 function Courses() {
   const navigate = useNavigate();
   const { creatorCourseData } = useSelector((state) => state.course);
+  const dispatch = useDispatch()
+  const {userData} = useSelector(state=>state.user)
+
+  useEffect(() => {
+    const creatorCourses = async () => {
+      try {
+        const result = await axios.get(serverUrl + "/api/course/getcreator", {
+          withCredentials: true,
+        });
+        console.log(result.data);
+        dispatch(setCreatorCourseData(result.data));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    creatorCourses();
+  }, [userData]);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -42,7 +63,7 @@ function Courses() {
                 <th className="text-left py-3 px-4">Courses</th>
                 <th className="text-left py-3 px-4">Price</th>
                 <th className="text-left py-3 px-4">Status</th>
-                <th className="text-left py-3 px-4">Action</th>
+                <th className="text-left py-3 px-4">Edit Course</th>
               </tr>
             </thead>
 
@@ -73,13 +94,11 @@ function Courses() {
                   </td>
 
                   {/* price */}
-                  {
-                  course?.price ? (
+                  {course?.price ? (
                     <td className="px-4 py-3">₹ {course?.price}</td>
                   ) : (
                     <td className="px-4 py-3">₹ NA</td>
-                  )
-                  }
+                  )}
                   {/* sttatus */}
                   <td className="px-4 py-3">
                     <span
@@ -95,7 +114,10 @@ function Courses() {
                   </td>
 
                   <td className="px-6 py-3">
-                    <FaEdit className=" h-7 w-7 text-gray-600 hover:text-blue-600 cursor-pointer" />
+                    <FaEdit
+                      className=" h-7 w-7 text-gray-600 hover:text-blue-600 cursor-pointer"
+                      onClick={() => navigate(`/editcourse/${course?._id}`)}
+                    />
                   </td>
                 </tr>
               ))}
@@ -110,41 +132,52 @@ function Courses() {
         {/* for table in small scrn */}
         <div className="md:hidden space-y-4">
           {creatorCourseData?.map((course, index) => (
-            <div key={index} className="bg-white rounded-lg shadow p-4 flex flex-col gap-3 ">
+            <div
+              key={index}
+              className="bg-white rounded-lg shadow p-4 flex flex-col gap-3 "
+            >
               <div className="flex gap-4 items-center">
-                {
-                  course?.thumbnail ?
+                {course?.thumbnail ? (
                   <img
                     src={course?.thumbnail}
-                  alt=""
-                  className="w-16 h-16 rounded-md object-cover"
+                    alt=""
+                    className="w-16 h-16 rounded-md object-cover"
                   />
-                  :
+                ) : (
                   <img
                     src={img}
-                  alt=""
-                  className="w-16 h-16 rounded-md object-cover"
+                    alt=""
+                    className="w-16 h-16 rounded-md object-cover"
                   />
-                }
+                )}
                 <div className="flex-1">
                   <h2 className="font-medium text-sm">{course?.title}</h2>
-                  {
-                    course?.price ?
-                    <p className="text-gray-600 text-xs mt-1">₹ {course?.price}</p>
-                    :
+                  {course?.price ? (
+                    <p className="text-gray-600 text-xs mt-1">
+                      ₹ {course?.price}
+                    </p>
+                  ) : (
                     <p className="text-gray-600 text-xs mt-1">₹ NA</p>
-                  }
+                  )}
                 </div>
 
                 <div className="px-6 py-3">
-                  <FaEdit className=" h-7 w-7 text-gray-600  cursor-pointer" />
+                  <FaEdit
+                    className=" h-7 w-7 text-gray-600  cursor-pointer"
+                    // we made it in controller to get course id from params
+                    // thatsa why we are sending course id
+                    onClick={() => navigate(`/editcourse/${course?._id}`)}
+                  />
                 </div>
               </div>
-              <span className={`w-fit px-3 py-1 text-xs rounded-full
-              ${course?.isPublished
-                 ? "bg-green-100 text-green-600"
-                 : "bg-red-100 text-red-600"
-              }`}>
+              <span
+                className={`w-fit px-3 py-1 text-xs rounded-full
+              ${
+                course?.isPublished
+                  ? "bg-green-100 text-green-600"
+                  : "bg-red-100 text-red-600"
+              }`}
+              >
                 {course?.isPublished ? "Published" : "Draft"}
               </span>
             </div>
