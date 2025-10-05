@@ -12,3 +12,28 @@ input[type="password"]::-webkit-credentials-auto-fill-button,
 input[type="password"]::-webkit-clear-button {
   display: none !important;
 }
+
+/* ===== Remove unwanted horizontal scrollbar globally ===== */
+html, body {
+  overflow-x: hidden !important;
+  width: 100%;
+}
+/* Hide scrollbars in modern browsers */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+/* Optional: Smooth scroll for better UX */
+html {
+  scroll-behavior: smooth;
+}
+/* Clamp text to 2 lines and add ellipsis */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

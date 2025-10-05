@@ -8,8 +8,10 @@ import Logos from "../component/Logos";
 import ExploreCourses from "../component/ExploreCourses";
 import Card from "../component/Card";
 import CardPage from "../component/CardPage";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const naviagate = useNavigate()
   return (
     <div className="w-[100%] overflow-hidden">
       <div className="w-[100%] lg:h-[140vh] h-[70vh] relative">
@@ -41,6 +43,7 @@ function Home() {
           <button
             className="px-[20px] py-[10px] border-2 lg:border-white border-black lg:text-white
             text-black rounded-[10px] text-[18px] font-light flex gap-2 cursor-pointer "
+            onClick={()=>{naviagate("/allcourses")}}
           >
             View All courses
             <SiViaplay className="w-[30px] h-[30px] lg:fill-white fill-black"/>

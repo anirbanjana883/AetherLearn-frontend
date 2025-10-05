@@ -6,8 +6,10 @@ import { MdOutlineSecurity } from "react-icons/md";
 import { GiArtificialIntelligence } from "react-icons/gi";
 import { SiBlockchaindotcom } from "react-icons/si";
 import { BsBarChartLine } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 function ExploreCourses() {
+  const naviagate = useNavigate()
   const courses = [
     {
       title: "Web Development",
@@ -62,7 +64,9 @@ function ExploreCourses() {
           build modern skills in technology, design, and innovation. From coding
           to AI, we’ve got you covered.
         </p>
-        <button className="px-5 py-3 bg-black text-white rounded-lg text-[16px] font-medium flex gap-2 mt-6 hover:bg-gray-800 transition">
+        <button className="px-5 py-3 bg-black text-white rounded-lg text-[16px] font-medium flex gap-2 mt-6 hover:bg-gray-800 transition cursor-pointer"
+          onClick={()=>{naviagate("/allcourses")}}
+        >
           Explore Courses
           <SiViaplay className="w-6 h-6" />
         </button>
