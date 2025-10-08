@@ -165,7 +165,9 @@ function EditCourse() {
         </h2>
 
         <div className="space-x2 space-y-2">
-          <button className="bg-black text-white px-4 py-2 rounded-md">
+          <button className="bg-black text-white px-4 py-2 rounded-md"
+            onClick={()=>navigate(`/createlecture/${selectedCourse?._id}`)}
+          >
             Go to lecture
           </button>
         </div>
@@ -267,7 +269,7 @@ function EditCourse() {
               <select
                 id="cat"
                 name="cat"
-                defaultValue=""
+               
                 aria-label="Select Category"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-700 
                focus:outline-none focus:ring-2 focus:ring-black focus:border-black 
@@ -301,7 +303,7 @@ function EditCourse() {
               <select
                 id="des"
                 name="des"
-                defaultValue=""
+                
                 aria-label="Select Level"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-700 
                focus:outline-none focus:ring-2 focus:ring-black focus:border-black 

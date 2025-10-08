@@ -16,6 +16,9 @@ import CreateCourses from './pages/Educator/CreateCourses'
 import getCreatorCourse from './customHooks/getCreatorCourse'
 import getPublishedCourse from './customHooks/getPublishedCourse'
 import AllCourses from './pages/AllCourses'
+import CreateLecture from './pages/Educator/CreateLecture'
+import EditLecture from './pages/Educator/EditLecture'
+import ViewCourse from './pages/ViewCourse'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -38,10 +41,22 @@ function App() {
             <Route path='/allcourses' element={userData ? <AllCourses/> : <Navigate to="/login"/>}/>
 
             {/* educator */}
+
+            {/* course */}
             <Route path='/dashboard' element={userData?.role === "educator" ? <Dashboard/> : <Navigate to="/"/>}/>
+
             <Route path='/courses' element={userData?.role === "educator" ? <Courses/> : <Navigate to="/"/>}/>
+
             <Route path='/createcourse' element={userData?.role === "educator" ? <CreateCourses/> : <Navigate to="/"/>}/>
+
             <Route path='/editcourse/:courseId' element={userData?.role === "educator" ? <EditCourse/> : <Navigate to="/"/>}/>
+
+            {/* lecture */}
+            <Route path='/createlecture/:courseId' element={userData?.role === "educator" ? <CreateLecture/> : <Navigate to="/"/>}/>
+
+            <Route path='/editlecture/:courseId/:lectureId' element={userData?.role === "educator" ? <EditLecture/> : <Navigate to="/"/>}/>
+
+            <Route path='/viewcourse/:courseId' element={userData?.role === "educator" ? <ViewCourse/> : <Navigate to="/"/>}/>
         </Routes>
     </>
   )
