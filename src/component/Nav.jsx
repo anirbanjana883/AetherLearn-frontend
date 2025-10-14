@@ -121,6 +121,7 @@ function Nav() {
               <span
                 className="bg-black text-white px-6 py-2 rounded-2xl font-medium shadow-sm
       hover:bg-gray-700 transition-colors duration-300 cursor-pointer"
+      onClick={()=>navigate("/mycourses")}
               >
                 My Courses
               </span>
@@ -188,6 +189,7 @@ function Nav() {
             className="w-[200px] h-[65px] border-2 border-white
                   bg-[black] flex items-center justify-center 
                    text-white rounded-[10px] text-[18px] font-light cursor-pointer"
+                   onClick={()=>navigate("/mycourses")}
           >
             My Courses
           </div>

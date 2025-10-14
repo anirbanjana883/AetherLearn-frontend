@@ -12,18 +12,19 @@ import { serverUrl } from "../App";
 import Card from "../component/Card";
 import { useId } from "react";
 import { toast } from "react-toastify";
+import { addEnrolledCourse } from "../redux/userSlice";
 
 function ViewCourse() {
   const navigate = useNavigate();
   const { courseId } = useParams();
   const { courseData } = useSelector((state) => state.course);
-  const { userData } = useSelector((state) => state.user)
+  const { userData } = useSelector((state) => state.user);
   const { selectedCourse } = useSelector((state) => state.course);
   const dispatch = useDispatch();
   const [selectedLecture, setSelectedLecture] = useState(null);
   const [creatorData, setCreatorData] = useState(null);
   const [creatorCourses, setCreatorCourses] = useState(null);
-  const [isEnrolled ,setIsEnrolled] = useState(false)
+  const [isEnrolled, setIsEnrolled] = useState(false);
 
   const fetchCourseData = async () => {
     courseData.map((course) => {
@@ -54,62 +55,66 @@ function ViewCourse() {
     handleCreator();
   }, [selectedCourse?.creator]);
 
-  const checkEnrollment = () =>{
-    const verify = userData?.enrolledCourses?.some(c =>
-       (typeof c === 'string' ? c : c._id).toString() === courseId?.toString()
-      )
-      if(verify){
-        setIsEnrolled(true)
-      }
-  }
+  const checkEnrollment = () => {
+  const enrolled = userData?.enrolledCourses?.some(
+    (c) => (typeof c === "string" ? c : c._id) === courseId
+  );
+  setIsEnrolled(enrolled || false);
+};
+
 
   useEffect(() => {
     fetchCourseData();
     checkEnrollment();
-  }, [courseData, courseId,userData]);
+  }, [courseData, courseId, userData]);
 
-  const handleEnroll = async (userId , courseId) =>{
+  const handleEnroll = async (userId, courseId) => {
     try {
-      const orderData = await axios.post(serverUrl + "/api/order/razorpay-order",
-        {userId , courseId},
-        {withCredentials : true}
-      )
-      console.log(orderData)
+      const orderData = await axios.post(
+        serverUrl + "/api/order/razorpay-order",
+        { userId, courseId },
+        { withCredentials: true }
+      );
+      console.log(orderData);
 
       const options = {
-        key : import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount : orderData.data.amount,
-        currency : 'INR',
-        name : "AETHERLEARN",
-        description : "COURSE ENROLLMENT PAYMENT",
-        order_id : orderData.data.id,
-        handler : async function (response) {
-          console.log("RazorPay Response" , response)
-          // after getting response
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: orderData.data.amount,
+        currency: "INR",
+        name: "AETHERLEARN",
+        description: "COURSE ENROLLMENT PAYMENT",
+        order_id: orderData.data.id,
+        handler: async function (response) {
           try {
-            const verifyPayment = await axios.post(serverUrl + "/api/order/verifypayment",
-              {...response,
+            const verifyPayment = await axios.post(
+              serverUrl + "/api/order/verifypayment",
+              {
                 courseId,
-                userId
-              },{withCredentials : true}
-            )
-            setIsEnrolled(true)
-            toast.success(verifyPayment.data.message)
+                userId,
+                ...response,
+              },
+              { withCredentials: true }
+            );
+
+            // Update Redux store immediately
+            dispatch(addEnrolledCourse(courseId));
+            setIsEnrolled(true);
+            toast.success(verifyPayment.data.message);
           } catch (error) {
-            toast.error(error.responses.data.message)
+            toast.error(
+              error.response?.data?.message || "Payment verification failed"
+            );
           }
-        }
-      }
+        },
+      };
 
-      
-
-      const rzp = new window.Razorpay(options)
-      rzp.open()
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
-      console.log((error))
-      toast.error("Something Went wrong while enrollig..")
+      console.log(error);
+      toast.error("Something Went wrong while enrollig..");
     }
-  }
+  };
 
   useEffect(() => {
     if (creatorData?._id && courseData?.length > 0) {
@@ -167,7 +172,7 @@ function ViewCourse() {
                   ₹ {selectedCourse?.price}
                 </span>{" "}
                 <span className="line-through text-sm text-gray-500">
-                  ₹ 999
+                  ₹ {selectedCourse?.price + 500}
                 </span>
               </div>
 
@@ -181,24 +186,21 @@ function ViewCourse() {
                 </ul>
               </div>
 
-              {
-  isEnrolled ? (
-    <button
-      onClick={() => handleEnroll(userData._id, courseId)}
-      className="bg-[black] text-white px-6 py-2 rounded-md hover:bg-gray-700 mt-4 self-start transition-colors duration-200 cursor-pointer"
-    >
-      Enroll Now
-    </button>
-  ) : (
-    <button
-      className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 mt-4 self-start transition-colors duration-200 cursor-pointer"
-    >
-      Explore Course
-    </button>
-  )
-}
-
-
+              {!isEnrolled ? (
+                <button
+                  onClick={() => handleEnroll(userData._id, courseId)}
+                  className="bg-[black] text-white px-6 py-2 rounded-md hover:bg-gray-700 mt-4 self-start transition-colors duration-200 cursor-pointer"
+                >
+                  Enroll Now
+                </button>
+              ) : (
+                <button
+                  className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 mt-4 self-start transition-colors duration-200 cursor-pointer"
+                  onClick={() => navigate(`/viewlecture/${courseId}`)}
+                >
+                  Explore Course
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -207,7 +209,7 @@ function ViewCourse() {
         <div>
           <h2 className="text-xl font-semibold mb-2">What You'll Learn</h2>
           <ul className="list-disc pl-6 text-gray-600 space-y-1">
-            <li>Learn {selectedCourse?.category} from Beginning</li>
+            <li>Learn {selectedCourse?.category} from Scratch</li>
           </ul>
         </div>
 
