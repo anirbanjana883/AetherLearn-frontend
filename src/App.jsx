@@ -23,6 +23,7 @@ import ScrollToTop from './component/ScrollToTop'
 import ViewLecture from './pages/ViewLecture'
 import MyEnrolledCourse from './pages/MyEnrolledCourse'
 import getAllReviews from './customHooks/getAllReviews'
+import SearchWithAi from './pages/searchWithAi'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -66,6 +67,7 @@ function App() {
             <Route path='/viewcourse/:courseId' element={userData ? <ViewCourse/> : <Navigate to="/login"/>}/>
             <Route path='/viewlecture/:courseId' element={userData ? <ViewLecture/> : <Navigate to="/login"/>}/>
             <Route path='/mycourses' element={userData ? <MyEnrolledCourse/> : <Navigate to="/login"/>}/>
+            <Route path='/search' element={userData ? <SearchWithAi/> : <Navigate to="/login"/>}/>
 
         </Routes>
     </>

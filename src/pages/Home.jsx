@@ -57,6 +57,7 @@ function Home() {
             className="px-[20px] py-[10px] border-2 lg:bg-white bg-black lg:text-black
             text-white rounded-[10px] text-[18px] font-light flex gap-2 cursor-pointer items-center
             justify-center"
+            onClick={()=>naviagate("/search")}
           >
             Search With AI
             <img src={ai_w}
