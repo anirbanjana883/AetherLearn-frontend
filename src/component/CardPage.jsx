@@ -40,6 +40,7 @@ function CardPge() {
               category={course?.category}
               price={course?.price}
               id={course?._id}
+              reviews={course?.reviews}
             />
           </div>
         ))}

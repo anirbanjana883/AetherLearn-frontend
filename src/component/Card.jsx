@@ -2,8 +2,20 @@ import React from "react";
 import { FaStar } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
-function Card({ thumbnail, title, category, price, id }) {
+function Card({ thumbnail, title, category, price, id , reviews}) {
   const navigate = useNavigate()
+
+  const calculateAvgReview = (reviews) =>{
+    if(!reviews || reviews.length === 0) {
+      return 0;
+    }
+    const total = reviews.reduce((sum , review) => sum + review.rating , 0)
+
+    return (total / reviews.length).toFixed(1)
+  }
+
+  const avgRating = calculateAvgReview(reviews)
+
   return (
     <div
       className="group relative bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl 
@@ -43,7 +55,7 @@ function Card({ thumbnail, title, category, price, id }) {
           </span>
           <span className="flex items-center gap-1 text-[15px] text-gray-700">
             <FaStar className="text-yellow-500" />
-            4.5
+            {avgRating}
           </span>
         </div>
       </div>
