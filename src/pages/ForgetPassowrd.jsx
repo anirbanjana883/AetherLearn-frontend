@@ -4,8 +4,7 @@ import axios from "axios";
 import { serverUrl } from "../App";
 import { toast } from "react-toastify";
 import ClipLoader from "react-spinners/ClipLoader";
-import { FaRegEye } from "react-icons/fa6";
-import { FaRegEyeSlash } from "react-icons/fa6";
+import { FaRegEye, FaRegEyeSlash, FaArrowLeftLong } from "react-icons/fa6";
 
 function ForgetPassowrd() {
   const [step, setStep] = useState(1);
@@ -15,11 +14,9 @@ function ForgetPassowrd() {
   const [newPassword, setNewPassword] = useState("");
   const [conPassword, setConPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [show, setShow] = useState(false);
-  const [show1, setShow1] = useState(false);
-  const [show2, setShow2] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConPass, setShowConPass] = useState(false);
 
-  // step 1
   const sendOtp = async () => {
     setLoading(true);
     try {
@@ -28,19 +25,15 @@ function ForgetPassowrd() {
         { email },
         { withCredentials: true }
       );
-
-      console.log(result.data);
       setLoading(false);
       setStep(2);
       toast.success(result.data.message);
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message || "Otp not sent");
+      toast.error(error.response?.data?.message || "OTP not sent");
       setLoading(false);
     }
   };
 
-  // step 2
   const verifyOtp = async () => {
     setLoading(true);
     try {
@@ -49,241 +42,138 @@ function ForgetPassowrd() {
         { email, otp },
         { withCredentials: true }
       );
-      console.log(result.data);
       setLoading(false);
       setStep(3);
       toast.success(result.data.message);
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message || "Otp not verified");
+      toast.error(error.response?.data?.message || "OTP not verified");
       setLoading(false);
     }
   };
 
-  // step 3
   const resetPassword = async () => {
+    if (newPassword !== conPassword) {
+      return toast.error("Passwords do not match");
+    }
     setLoading(true);
     try {
-      if (newPassword !== conPassword) {
-        setLoading(false);
-        return toast.error("Password not matched");
-      }
       const result = await axios.post(
         serverUrl + "/api/auth/resetpassword",
         { email, password: newPassword },
         { withCredentials: true }
       );
-      console.log(result.data);
       setLoading(false);
-      // setStep(3)
       toast.success(result.data.message);
+      navigate("/login"); // Navigate to login on success
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message || "Password resetting failed");
+      toast.error(error.response?.data?.message || "Password reset failed");
       setLoading(false);
     }
   };
 
+  const renderStepContent = () => {
+    switch (step) {
+      case 1:
+        return {
+          title: "Forgot Password",
+          description: "Enter your email address to receive a verification code.",
+          fields: [
+            { id: "email", type: "email", label: "Email", value: email, action: setEmail, placeholder: "your.email@example.com" }
+          ],
+          buttonText: "Send OTP",
+          action: sendOtp
+        };
+      case 2:
+        return {
+          title: "Enter OTP",
+          description: `Enter the 4-digit code sent to ${email}.`,
+          fields: [
+            { id: "otp", type: "text", label: "Verification Code", value: otp, action: setOtp, placeholder: "1234" }
+          ],
+          buttonText: "Verify OTP",
+          action: verifyOtp
+        };
+      case 3:
+        return {
+          title: "Reset Password",
+          description: "Create a new, strong password for your account.",
+          fields: [
+            { id: "newPassword", type: showNewPass ? "text" : "password", label: "New Password", value: newPassword, action: setNewPassword, placeholder: "Enter new password", showToggle: true, showState: showNewPass, setShow: setShowNewPass },
+            { id: "conPassword", type: showConPass ? "text" : "password", label: "Confirm New Password", value: conPassword, action: setConPassword, placeholder: "Confirm new password", showToggle: true, showState: showConPass, setShow: setShowConPass }
+          ],
+          buttonText: "Reset Password",
+          action: resetPassword
+        };
+      default:
+        return {};
+    }
+  };
+
+  const { title, description, fields, buttonText, action } = renderStepContent();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      {/* step 1 : enter email send otp */}
-
-      {step == 1 && (
-        <div className="bg-white shadow-md rounded-xl p-8 max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-            Forgot your password ?
-          </h2>
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Enter your email adress
-              </label>
-
-              <input
-                id="email"
-                type="text"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm 
-              focus:outline-none focus:ring-2 focus-ring-[black] "
-                placeholder="example@gmail.com"
-                required
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-              />
-            </div>
-            <button
-              type="button" 
-              className="w-full bg-[black] hover:bg-[#4b4b4b] text-white
-            py-2 px-4 rounded-md font-medium cursor-pointer"
-              disabled={loading}
-              onClick={sendOtp}
-            >
-              {loading ? <ClipLoader size={30} color="white" /> : "Send OTP"}
-            </button>
-          </form>
+    <div className="w-full min-h-screen relative bg-[#030712] text-white flex items-center justify-center p-4">
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_rgba(37,99,235,0.1)_0%,#030712_70%)]"></div>
+      
+      <div className="relative z-10 w-full max-w-md bg-slate-900/40 backdrop-blur-xl border border-blue-500/30 rounded-2xl shadow-[0_0_50px_rgba(59,130,246,0.3)] overflow-hidden">
+        {/* Progress Bar */}
+        <div className="w-full bg-black/30 h-2.5">
           <div
-            className="text-sm text-center mt-4 cursor-pointer"
-            onClick={() => navigate("/login")}
-          >
-            Back to Login
-          </div>
+            className="bg-gradient-to-r from-cyan-400 to-blue-500 h-full transition-all duration-500 ease-out"
+            style={{ width: `${(step / 3) * 100}%` }}
+          ></div>
         </div>
-      )}
-
-      {/* step 2 : submit otp or verify otp */}
-
-      {step == 2 && (
-        <div className="bg-white shadow-md rounded-xl p-8 max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-            Enter OTP
-          </h2>
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-            <div className="relative">
-              <label
-                htmlFor="otp"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Enter 4-digit code sent to your email
-              </label>
-
-              <input
-                id="otp"
-                type={show2 ? "text" : "password"}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm 
-              focus:outline-none focus:ring-2 focus-ring-[black] "
-                placeholder="* * * *"
-                required
-                onChange={(e) => setOtp(e.target.value)}
-                value={otp}
-              />
-              {show2 ? (
-                <FaRegEye
-                  className="absolute w-[20px] h-[20px] cursor-pointer right-[2%] bottom-[15%]"
-                  onClick={() => setShow2((prev) => !prev)}
-                />
-              ) : (
-                <FaRegEyeSlash
-                  className="absolute w-[20px] h-[20px] cursor-pointer right-[2%] bottom-[15%]"
-                  onClick={() => setShow2((prev) => !prev)}
-                />
-              )}
-            </div>
-            <button
-              type="button" 
-              className="w-full bg-[black] hover:bg-[#4b4b4b] text-white
-            py-2 px-4 rounded-md font-medium cursor-pointer"
-              disabled={loading}
-              onClick={verifyOtp}
-            >
-              {loading ? <ClipLoader size={30} color="white" /> : "Verify OTP"}
-            </button>
-          </form>
-          <div
-            className="text-sm text-center mt-4 cursor-pointer"
-            onClick={() => navigate("/login")}
-          >
-            Back to Login
+        
+        <div className="p-8">
+          <div className="text-center mb-8">
+            <h1 className="font-bold text-3xl text-slate-100">{title}</h1>
+            <p className="text-slate-400 text-base mt-2">{description}</p>
           </div>
-        </div>
-      )}
 
-      {/* step 3 : reset password */}
-
-      {step == 3 && (
-        <div className="bg-white shadow-md rounded-xl p-8 max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-            Reset Password
-          </h2>
-          <p className="text-sm text-gray-500 text-center mb-6">
-            Enter new password to regain access of your account
-          </p>
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-            <div className="relative">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                New password
-              </label>
-
-              <input
-                id="password"
-                type={show ? "text" : "password"}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm 
-              focus:outline-none focus:ring-2 focus-ring-[black] "
-                placeholder="* * * * * * * *"
-                required
-                onChange={(e) => setNewPassword(e.target.value)}
-                value={newPassword}
-              />
-              {show ? (
-                <FaRegEye
-                  className="absolute w-[20px] h-[20px] cursor-pointer right-[2%] bottom-[15%]"
-                  onClick={() => setShow((prev) => !prev)}
+          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            {fields.map(field => (
+              <div key={field.id} className="relative">
+                <label htmlFor={field.id} className="font-semibold text-slate-300 text-sm mb-1 block">{field.label}</label>
+                <input
+                  id={field.id}
+                  type={field.type}
+                  className="w-full p-3 pr-12 bg-black/30 text-white placeholder-slate-500 border border-blue-500/40 rounded-lg 
+                             focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 transition-all"
+                  placeholder={field.placeholder}
+                  required
+                  onChange={(e) => field.action(e.target.value)}
+                  value={field.value}
                 />
-              ) : (
-                <FaRegEyeSlash
-                  className="absolute w-[20px] h-[20px] cursor-pointer right-[2%] bottom-[15%]"
-                  onClick={() => setShow((prev) => !prev)}
-                />
-              )}
-            </div>
-
-            <div className="relative">
-              <label
-                htmlFor="conpassword"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Confirm new password
-              </label>
-
-              <input
-                id="conpassword"
-                type={show1 ? "text" : "password"}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm 
-              focus:outline-none focus:ring-2 focus-ring-[black] "
-                placeholder="* * * * * * * *"
-                required
-                onChange={(e) => setConPassword(e.target.value)}
-                value={conPassword}
-              />
-              {show1 ? (
-                <FaRegEye
-                  className="absolute w-[20px] h-[20px] cursor-pointer right-[2%] bottom-[15%]"
-                  onClick={() => setShow1((prev) => !prev)}
-                />
-              ) : (
-                <FaRegEyeSlash
-                  className="absolute w-[20px] h-[20px] cursor-pointer right-[2%] bottom-[15%]"
-                  onClick={() => setShow1((prev) => !prev)}
-                />
-              )}
-            </div>
+                {field.showToggle && (
+                  <button type="button" className="absolute right-4 top-[42px] -translate-y-1/2 text-slate-400 hover:text-cyan-300" onClick={() => field.setShow(!field.showState)}>
+                    {field.showState ? <FaRegEye className="w-5 h-5" /> : <FaRegEyeSlash className="w-5 h-5" />}
+                  </button>
+                )}
+              </div>
+            ))}
 
             <button
-              type="button" 
-              className="w-full bg-[black] hover:bg-[#4b4b4b] text-white
-            py-2 px-4 rounded-md font-medium cursor-pointer"
+              className="w-full p-3 mt-6 bg-blue-600 text-white font-bold rounded-lg flex items-center justify-center
+                         transition-all duration-300 hover:bg-blue-700 hover:shadow-[0_0_20px_rgba(59,130,246,0.8)]
+                         disabled:bg-blue-800 disabled:cursor-not-allowed"
               disabled={loading}
-              onClick={resetPassword}
+              onClick={action}
             >
-              {loading ? (
-                <ClipLoader size={30} color="white" />
-              ) : (
-                "Reset Password"
-              )}
+              {loading ? <ClipLoader size={24} color="white" /> : buttonText}
             </button>
           </form>
-          <div
-            className="text-sm text-center mt-4 cursor-pointer"
-            onClick={() => navigate("/login")}
-          >
-            Back to Login
+
+          <div className="text-center mt-6">
+            <button
+              onClick={() => navigate("/login")}
+              className="text-sm text-slate-400 hover:text-cyan-300 flex items-center justify-center gap-2 mx-auto"
+            >
+              <FaArrowLeftLong />
+              Back to Login
+            </button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

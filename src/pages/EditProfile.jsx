@@ -17,167 +17,119 @@ function EditProfile() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
-  // const fromData = new FormData();
-  // fromData.append("name", name);
-  // fromData.append("description", description);
-  // fromData.append("photoUrl", photoUrl);
-
   const handleEditProfile = async () => {
     setLoading(true);
     try {
       const formData = new FormData();
       formData.append("name", name);
       formData.append("description", description);
-      if (photoUrl) {
-        formData.append("photoUrl", photoUrl); 
-      }
+      if (photoUrl) formData.append("photoUrl", photoUrl);
 
-      const result = await axios.post(
-        serverUrl + "/api/user/profile",
-        formData,
-        { withCredentials: true }
-      );
+      const result = await axios.post(`${serverUrl}/api/user/profile`, formData, {
+        withCredentials: true,
+      });
       dispatch(setUserData(result.data));
       setLoading(false);
-      navigate("/");
+      navigate("/profile");
       toast.success("Profile updated successfully");
     } catch (error) {
       setLoading(false);
-      console.log(error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to update profile");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-xl w-full relative">
+    <div className="min-h-screen flex items-center justify-center bg-[#030712] px-4 py-10 font-inter text-white">
+      <div className="bg-[#0A0F1C] rounded-2xl shadow-[0_0_25px_rgba(37,99,235,0.3)] hover:shadow-[0_0_45px_rgba(37,99,235,0.6)] p-8 max-w-xl w-full relative border border-blue-500/40 transition-all duration-500">
+        
+        {/* Back button */}
         <FaArrowLeftLong
-          className="absolute top-[5%] left-[5%] w-[27px] h-[27px] cursor-pointer"
+          className="absolute top-[5%] left-[5%] w-7 h-7 text-blue-400 cursor-pointer hover:scale-110 transition-transform"
           onClick={() => navigate("/profile")}
         />
 
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+        <h2 className="text-2xl font-bold text-center text-blue-400 drop-shadow-[0_0_5px_rgba(37,99,235,0.9)] mb-6">
           Edit Profile
         </h2>
 
-        <form
-          action=""
-          className="space-y-5"
-          onSubmit={(e) => e.preventDefault()}
-        >
-          {/* photo of user */}
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+          {/* Profile Photo */}
           <div className="flex flex-col items-center text-center">
             {userData?.photoUrl ? (
               <img
-                src={userData?.photoUrl}
+                src={userData.photoUrl}
                 alt=""
-                className="w-24 h-24 rounded-full object-cover border-4 border-[black]"
+                className="w-24 h-24 rounded-full object-cover border-4 border-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.7)]"
               />
             ) : (
-              <div
-                className="w-24 h-24 rounded-full text-white flex items-center justify-center
-          text-[50px] border-2 bg-black border-white"
-              >
-                {userData?.name.slice(0, 1).toUpperCase()}
+              <div className="w-24 h-24 rounded-full flex items-center justify-center text-[50px] border-2 border-blue-500 bg-black text-blue-400 shadow-[0_0_10px_rgba(37,99,235,0.7)]">
+                {userData?.name?.slice(0, 1).toUpperCase()}
               </div>
             )}
           </div>
-          {/* Avatar Upload */}
-          <div className="mb-4">
-            <label
-              htmlFor="image"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Select Avatar
-            </label>
 
+          {/* Avatar Upload */}
+          <div>
+            <label className="block text-sm font-medium text-blue-400 mb-2">Select Avatar</label>
             <div className="flex items-center gap-3">
-              {/* Hidden Input */}
               <input
                 type="file"
                 id="image"
-                name="photoUrl"
                 accept="image/*"
                 className="hidden"
                 onChange={(e) => setPhotoUrl(e.target.files[0])}
               />
-
-              {/* Custom Button */}
               <label
                 htmlFor="image"
-                className="cursor-pointer px-4 py-2 bg-black text-white text-sm rounded-md 
-                 hover:bg-gray-800 transition"
+                className="cursor-pointer px-4 py-2 bg-black text-white text-sm rounded-md hover:shadow-[0_0_10px_rgba(37,99,235,0.7)] transition"
               >
                 Choose File
               </label>
-
-              {/* File Name Display
-              <span
-                id="fileName"
-                className="text-sm text-gray-500 truncate max-w-[200px]"
-              >
-                {photoUrl.name}
-              </span> */}
+              {photoUrl && <span className="text-sm text-gray-400 truncate max-w-[150px]">{photoUrl.name}</span>}
             </div>
           </div>
 
           {/* User Name */}
-          <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              User Name
-            </label>
+          <div>
+            <label className="block text-sm font-medium text-blue-400 mb-1">User Name</label>
             <input
-              id="name"
               type="text"
               placeholder={userData?.name}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm
-               focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
-              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-2 rounded-md bg-[#030712] border border-blue-500/50 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
               value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
 
           {/* Email */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
+          <div>
+            <label className="block text-sm font-medium text-blue-400 mb-1">Email</label>
             <input
               readOnly
               type="text"
               placeholder={userData?.email}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm 
-               bg-gray-100 text-gray-700 cursor-not-allowed"
+              className="w-full px-4 py-2 rounded-md bg-[#0A0F1C] border border-blue-500/50 text-gray-400 text-sm cursor-not-allowed"
             />
           </div>
 
           {/* Bio */}
-          <div className="mb-4">
-            <label
-              htmlFor="bio"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Bio
-            </label>
+          <div>
+            <label className="block text-sm font-medium text-blue-400 mb-1">Bio</label>
             <textarea
-              id="bio"
-              name="description"
               rows={3}
               placeholder="Tell us about yourself..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm resize-none
-               focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
-              onChange={(e) => setDescription(e.target.value)}
+              className="w-full px-4 py-2 rounded-md bg-[#030712] border border-blue-500/50 text-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
               value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
+
+          {/* Save Button */}
           <button
-            className="w-full bg-[black] active:bg-[#454545] text-white py-2 rounded-md font-medium
-             transition"
-            disabled={loading}
+            type="submit"
             onClick={handleEditProfile}
+            disabled={loading}
+            className="w-full bg-black py-2 rounded-md text-white font-medium hover:shadow-[0_0_15px_rgba(37,99,235,0.7)] transition-all duration-300"
           >
             {loading ? <ClipLoader size={30} color="white" /> : "Save Changes"}
           </button>

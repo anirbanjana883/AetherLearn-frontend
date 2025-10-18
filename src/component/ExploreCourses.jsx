@@ -1,7 +1,7 @@
 import React from "react";
 import { SiViaplay } from "react-icons/si";
 import { FaAppStoreIos } from "react-icons/fa";
-import { FaFigma, FaReact, FaBrain, FaDatabase } from "react-icons/fa";
+import { FaFigma, FaReact, FaDatabase } from "react-icons/fa";
 import { MdOutlineSecurity } from "react-icons/md";
 import { GiArtificialIntelligence } from "react-icons/gi";
 import { SiBlockchaindotcom } from "react-icons/si";
@@ -9,82 +9,104 @@ import { BsBarChartLine } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 
 function ExploreCourses() {
-  const naviagate = useNavigate()
-  const courses = [
+  const navigate = useNavigate();
+  // Updated courses array to include theme-specific colors for borders and shadows
+    const courses = [
     {
       title: "Web Development",
-      icon: <FaReact className="w-10 h-10 text-[#0A7EA4]" />,
-      bg: "bg-[#E0F7FA]",
+      icon: <FaReact className="w-12 h-12 text-cyan-400" />,
+      borderColor: "border-cyan-500",
+      shadowColor: "hover:shadow-[0_0_30px_rgba(34,211,238,0.6)]",
     },
     {
       title: "UI/UX Designing",
-      icon: <FaFigma className="w-10 h-10 text-[#F24E1E]" />,
-      bg: "bg-[#FFEDE6]",
+      icon: <FaFigma className="w-12 h-12 text-orange-500" />,
+      borderColor: "border-orange-500",
+      shadowColor: "hover:shadow-[0_0_30px_rgba(249,115,22,0.6)]",
     },
     {
       title: "App Development",
-      icon: <FaAppStoreIos className="w-10 h-10 text-[#6d6d6c]" />,
-      bg: "bg-[#FFF5E1]",
+      icon: <FaAppStoreIos className="w-12 h-12 text-sky-400" />,
+      borderColor: "border-sky-500",
+      shadowColor: "hover:shadow-[0_0_30px_rgba(56,189,248,0.6)]",
     },
     {
       title: "Blockchain",
-      icon: <SiBlockchaindotcom className="w-10 h-10 text-[#1C75BC]" />,
-      bg: "bg-[#E6F0FF]",
+      icon: <SiBlockchaindotcom className="w-12 h-12 text-blue-500" />,
+      borderColor: "border-white-500", 
+      shadowColor: "hover:shadow-[0_0_30px_rgba(59,130,246,0.6)]",
     },
     {
       title: "AI / ML",
-      icon: <GiArtificialIntelligence className="w-10 h-10 text-[#8B5CF6]" />,
-      bg: "bg-[#F3E8FF]",
+      icon: <GiArtificialIntelligence className="w-12 h-12 text-purple-500" />,
+      borderColor: "border-purple-500",
+      shadowColor: "hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]",
     },
     {
       title: "Data Science",
-      icon: <FaDatabase className="w-10 h-10 text-[#16A34A]" />,
-      bg: "bg-[#E8F5E9]",
+      icon: <FaDatabase className="w-12 h-12 text-green-500" />,
+      borderColor: "border-green-500",
+      shadowColor: "hover:shadow-[0_0_30px_rgba(34,197,94,0.6)]",
     },
     {
       title: "Data Analytics",
-      icon: <BsBarChartLine className="w-10 h-10 text-[#F59E0B]" />,
-      bg: "bg-[#FFF7E6]",
+      icon: <BsBarChartLine className="w-12 h-12 text-yellow-500" />,
+      borderColor: "border-yellow-500",
+      shadowColor: "hover:shadow-[0_0_30px_rgba(234,179,8,0.6)]",
     },
     {
       title: "Ethical Hacking",
-      icon: <MdOutlineSecurity className="w-10 h-10 text-[#DC2626]" />,
-      bg: "bg-[#FEE2E2]",
+      icon: <MdOutlineSecurity className="w-12 h-12 text-red-500" />,
+      borderColor: "border-red-500",
+      shadowColor: "hover:shadow-[0_0_30px_rgba(239,68,68,0.6)]",
     },
   ];
 
+
   return (
-    <div className="w-[100vw] min-h-[60vh] lg:h-[60vh] flex flex-col lg:flex-row items-center justify-center gap-6 px-6 py-10">
+    <div className="w-full min-h-[60vh] relative bg-[#030712] text-white flex flex-col lg:flex-row items-center justify-center gap-12 px-6 py-16 md:py-24 overflow-hidden">
+      {/* Background Gradient */}
+      <div className="absolute w-[150%] h-[150%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(circle_farthest-corner,rgba(37,99,235,0.1)_0%,rgba(3,7,18,0)_60%)]"></div>
+
       {/* Left Section */}
-      <div className="w-full lg:w-[350px] h-auto flex flex-col items-start justify-center gap-3 md:px-6 px-2">
-        <span className="text-[35px] font-semibold">Explore</span>
-        <span className="text-[35px] font-semibold">Our Courses</span>
-        <p className="text-[16px] text-gray-600 leading-relaxed">
+      <div className="relative z-10 w-full lg:w-[400px] flex flex-col items-center lg:items-start text-center lg:text-left justify-center gap-3">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-300 drop-shadow-[0_0_15px_rgba(37,99,235,0.5)]">
+          Explore Our Courses
+        </h2>
+        <p className="text-base text-slate-300 leading-relaxed max-w-sm mt-2">
           Discover a variety of career-oriented courses designed to help you
           build modern skills in technology, design, and innovation. From coding
           to AI, we’ve got you covered.
         </p>
-        <button className="px-5 py-3 bg-black text-white rounded-lg text-[16px] font-medium flex gap-2 mt-6 hover:bg-gray-800 transition cursor-pointer"
-          onClick={()=>{naviagate("/allcourses")}}
+        <button
+          className="group relative flex items-center justify-center gap-3 px-6 py-3 mt-6 rounded-lg text-lg font-semibold bg-blue-600 border-2 border-blue-600 text-white
+                     transition-all duration-300 hover:bg-blue-700 hover:shadow-[0_0_25px_rgba(37,99,235,0.8)] focus:outline-none focus:ring-4 focus:ring-blue-500/50"
+          onClick={() => { navigate("/allcourses") }}
         >
-          Explore Courses
-          <SiViaplay className="w-6 h-6" />
+          Explore All
+          <SiViaplay className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
         </button>
       </div>
 
       {/* Right Section */}
-      <div className="w-[720px] max-w-[95%] grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 lg:gap-10 mb-8 lg:mb-0">
+      <div className="relative z-10 w-full max-w-3xl grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
         {courses.map((course, i) => (
           <div
             key={i}
-            className="w-full h-[140px] flex flex-col items-center justify-center gap-3 text-center cursor-pointer group"
+            className={`
+              group relative flex flex-col items-center justify-center gap-4 p-4 rounded-2xl cursor-pointer
+              bg-slate-900/50 backdrop-blur-md border ${course.borderColor}/30 
+              transition-all duration-300
+              hover:scale-105 hover:-translate-y-2 hover:bg-slate-900/80 hover:shadow-[0_0_30px_-5px_rgba(0,0,0,0.4)]
+              ${course.shadowColor}
+            `}
+            // A simple navigation handler can be added here if needed
+            // onClick={() => navigate(`/courses/${course.title.toLowerCase().replace(' ', '-')}`)}
           >
-            <div
-              className={`${course.bg} w-[100px] h-[90px] rounded-xl flex items-center justify-center group-hover:scale-105 transition`}
-            >
+            <div className="transition-transform duration-300 group-hover:scale-110">
               {course.icon}
             </div>
-            <span className="text-[14px] font-medium text-gray-700 group-hover:text-black">
+            <span className="text-sm font-semibold text-center text-slate-200 transition-colors group-hover:text-white">
               {course.title}
             </span>
           </div>

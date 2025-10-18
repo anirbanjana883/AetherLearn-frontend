@@ -17,6 +17,7 @@ input[type="password"]::-webkit-clear-button {
 html, body {
   overflow-x: hidden !important;
   width: 100%;
+  background-color: #030712;
 }
 /* Hide scrollbars in modern browsers */
 .scrollbar-hide::-webkit-scrollbar {
@@ -53,3 +54,5 @@ html {
 .animate-vibrate { animation: vibrate 0.2s infinite; }
 .animate-vibrate-slow { animation: vibrate-slow 0.5s infinite; }
 .animate-float { animation: float linear infinite; }
+
+

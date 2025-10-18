@@ -70,10 +70,25 @@ function ModernVideoPlayer({ src }) {
     setIsMuted(vol === 0);
   };
 
-  const toggleFullscreen = () => {
+const toggleFullscreen = async () => {
     const container = videoRef.current.parentElement;
-    if (!document.fullscreenElement) container.requestFullscreen();
-    else document.exitFullscreen();
+    if (!container) return;
+
+    try {
+      if (!document.fullscreenElement) {
+        // Enter fullscreen
+        await container.requestFullscreen();
+        // Lock to landscape (primarily for mobile)
+        await screen.orientation.lock("landscape");
+      } else {
+        // Exit fullscreen
+        await document.exitFullscreen();
+        // Unlock orientation
+        screen.orientation.unlock();
+      }
+    } catch (error) {
+      console.error("Fullscreen or orientation lock failed:", error);
+    }
   };
 
   const handleSpeedChange = (e) => {

@@ -1,48 +1,54 @@
 import React from 'react'
 import { MdOutlineCastForEducation } from "react-icons/md";
 import { FaChalkboardTeacher, FaUsers, FaCertificate, FaGlobeAmericas } from "react-icons/fa";
-import { BiTimeFive } from "react-icons/bi";
 
 function Logos() {
+  // Data array for easier mapping and management
+  const stats = [
+    {
+      icon: <MdOutlineCastForEducation />,
+      text: "20k+ Online Courses"
+    },
+    {
+      icon: <FaChalkboardTeacher />,
+      text: "10k+ Expert Instructors"
+    },
+    {
+      icon: <FaCertificate />,
+      text: "100+ Certifications"
+    },
+    {
+      icon: <FaUsers />,
+      text: "50k+ Students Enrolled"
+    },
+    {
+      icon: <FaGlobeAmericas />,
+      text: "Global Learning Community"
+    }
+  ];
+
   return (
-    <div className='w-[100vw] min-h-[90px] flex flex-wrap items-center justify-center gap-4 md:mb-[50px] px-4'>
-
-      <div className='flex items-center justify-center gap-2 px-5 py-3 rounded-3xl bg-gray-200 cursor-pointer text-[#03394b] 
-                      w-full sm:w-[45%] md:w-auto'>
-        <MdOutlineCastForEducation className='w-[35px] h-[35px] fill-[#03394b]' />
-        20k+ Online Courses
+    <div className='w-full bg-black/20 py-12 md:py-16'>
+      <div className='w-full max-w-7xl mx-auto flex flex-wrap items-center justify-center gap- md:gap-8 px-4'>
+        {stats.map((stat, index) => (
+          <div
+            key={index}
+            className='
+              flex items-center justify-center gap-4 px-6 py-4 rounded-xl 
+              bg-slate-900/40 backdrop-blur-md border border-blue-500/30 
+              text-slate-300 font-semibold text-base md:text-lg 
+              transition-all duration-300 cursor-pointer
+              hover:bg-slate-800/60 hover:border-cyan-400 hover:-translate-y-1
+              hover:shadow-[0_0_25px_rgba(34,211,238,0.4)]
+              w-full sm:w-auto sm:flex-grow md:flex-grow-0
+            '
+          >
+            {/* Clones the icon to apply new styles */}
+            {React.cloneElement(stat.icon, { className: "text-cyan-400 text-3xl md:text-4xl" })}
+            <span>{stat.text}</span>
+          </div>
+        ))}
       </div>
-
-      <div className='flex items-center justify-center gap-2 px-5 py-3 rounded-3xl bg-gray-200 cursor-pointer text-[#03394b] 
-                      w-full sm:w-[45%] md:w-auto'>
-        <FaChalkboardTeacher className='w-[35px] h-[35px] fill-[#03394b]' />
-        10k+ Expert Instructors
-      </div>
-
-      {/* <div className='flex items-center justify-center gap-2 px-5 py-3 rounded-3xl bg-gray-200 cursor-pointer text-[#03394b] 
-                      w-full sm:w-[45%] md:w-auto'>
-        <BiTimeFive className='w-[35px] h-[35px] fill-[#03394b]' />
-        5k+ Hours of Content
-      </div> */}
-
-      <div className='flex items-center justify-center gap-2 px-5 py-3 rounded-3xl bg-gray-200 cursor-pointer text-[#03394b] 
-                      w-full sm:w-[45%] md:w-auto'>
-        <FaCertificate className='w-[35px] h-[35px] fill-[#03394b]' />
-        100+ Certifications
-      </div>
-
-      <div className='flex items-center justify-center gap-2 px-5 py-3 rounded-3xl bg-gray-200 cursor-pointer text-[#03394b] 
-                      w-full sm:w-[45%] md:w-auto'>
-        <FaUsers className='w-[35px] h-[35px] fill-[#03394b]' />
-        50k+ Students Enrolled
-      </div>
-
-      <div className='flex items-center justify-center gap-2 px-5 py-3 rounded-3xl bg-gray-200 cursor-pointer text-[#03394b] 
-                      w-full sm:w-[45%] md:w-auto'>
-        <FaGlobeAmericas className='w-[35px] h-[35px] fill-[#03394b]' />
-        Global Learning Community
-      </div>
-
     </div>
   )
 }

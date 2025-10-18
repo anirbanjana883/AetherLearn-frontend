@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
+import { FaEdit } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -7,7 +8,6 @@ import { serverUrl } from "../../App";
 import ClipLoader from "react-spinners/ClipLoader";
 import { setLectureData } from "../../redux/lectureSlice";
 import { toast } from "react-toastify";
-import { FaEdit } from "react-icons/fa";
 
 function CreateLecture() {
   const navigate = useNavigate();
@@ -25,7 +25,6 @@ function CreateLecture() {
         { lectureTitle },
         { withCredentials: true }
       );
-      console.log(result.data);
       dispatch(setLectureData([...lectureData, result.data.lecture]));
       setLoading(false);
       toast.success("Lecture created successfully");
@@ -44,55 +43,54 @@ function CreateLecture() {
           serverUrl + `/api/course/courselecture/${courseId}`,
           { withCredentials: true }
         );
-
         dispatch(setLectureData(result?.data.lectures));
-        console.log(result.data);
       } catch (error) {
         console.log(error);
       }
     };
-
-    getCourseLecture(); 
+    getCourseLecture();
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white shadow-xl rounded-xl w-full max-w-2xl p-6">
-        {/* hedder */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-800 mb-1">
-            Add a New Lecture
-          </h1>
-
-          <p className="text-sm text-gray-500">
-            Enter Title and add Lectures to enhance your course content.
-          </p>
+    <div className="min-h-screen bg-[#030712] text-white flex items-center justify-center p-4">
+      <div className="bg-[#0A0F1C] w-full max-w-2xl rounded-2xl shadow-[0_0_20px_rgba(37,99,235,0.4)] border border-blue-500/40 p-6 hover:shadow-[0_0_35px_rgba(37,99,235,0.7)] transition-all duration-500">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <FaArrowLeftLong
+            className="w-6 h-6 text-blue-400 hover:text-blue-300 cursor-pointer transition-all duration-300"
+            onClick={() => navigate(`/editcourse/${courseId}`)}
+          />
+          <div>
+            <h1 className="text-2xl font-semibold text-blue-400 drop-shadow-[0_0_8px_rgba(37,99,235,0.8)]">
+              Add a New Lecture
+            </h1>
+            <p className="text-sm text-gray-400">
+              Enter a title and add lectures to enhance your course content.
+            </p>
+          </div>
         </div>
 
-        {/* input section */}
+        {/* Input */}
         <input
           type="text"
-          className="w-full border border-gray-300 rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-black mb-4"
           placeholder="e.g Introduction to AI"
-          onChange={(e) => setLectureTitle(e.target.value)}
+          className="w-full bg-[#0A0F1C] border border-blue-500/40 text-blue-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:border-blue-400 hover:border-blue-400 transition-all duration-300 placeholder-gray-500"
           value={lectureTitle}
+          onChange={(e) => setLectureTitle(e.target.value)}
         />
 
+        {/* Buttons */}
         <div className="flex gap-4 mb-6">
           <button
-            className="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300
-                 text-sm font-medium"
-            onClick={() => {
-              navigate(`/editcourse/${courseId}`);
-            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-blue-500/40 text-blue-400 hover:bg-blue-900 hover:text-white transition-all duration-300"
+            onClick={() => navigate(`/editcourse/${courseId}`)}
           >
             <FaArrowLeftLong />
             Back to course
           </button>
 
           <button
-            className="px-5 py-2 rounded-md bg-[black] text-white hover:bg-gray-700
-                 transition-all text-sm font-medium shadow"
+            className="px-5 py-2 rounded-lg bg-blue-900 text-white hover:bg-blue-800 transition-all duration-300 shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_25px_rgba(37,99,235,0.8)]"
             onClick={handleCreateLecture}
             disabled={loading || !lectureTitle.trim()}
           >
@@ -100,20 +98,25 @@ function CreateLecture() {
           </button>
         </div>
 
-        {/* all lectures */}
+        {/* Lecture List */}
         <div className="space-y-2">
-            {lectureData?.map((lecture,index)=>(
-                <div key={index} 
-                className="bg-gray-100 rounded-md flex justify-between items-center p-3 text-sm
-                 font-medium text-gray-700">
-                    <span>{index + 1} : {lecture?.lectureTitle}</span>
-                    <FaEdit className="text-gray-500 hover:text-gray-700 cursor-pointer"
-                      onClick={()=>navigate(`/editlecture/${courseId}/${lecture._id}`)}
-                    />
-                </div>
-            ))}
+          {lectureData?.map((lecture, index) => (
+            <div
+              key={index}
+              className="bg-[#0B1324] rounded-xl flex justify-between items-center p-3 text-sm border border-blue-500/30 hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] transition-all duration-300"
+            >
+              <span className="text-blue-300">
+                {index + 1} : {lecture?.lectureTitle}
+              </span>
+              <FaEdit
+                className="text-blue-400 hover:text-blue-300 cursor-pointer transition-all duration-300"
+                onClick={() =>
+                  navigate(`/editlecture/${courseId}/${lecture._id}`)
+                }
+              />
+            </div>
+          ))}
         </div>
-
       </div>
     </div>
   );
