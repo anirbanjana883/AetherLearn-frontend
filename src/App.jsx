@@ -24,6 +24,7 @@ import ViewLecture from './pages/ViewLecture'
 import MyEnrolledCourse from './pages/MyEnrolledCourse'
 import getAllReviews from './customHooks/getAllReviews'
 import SearchWithAi from './pages/searchWithAi'
+import StudentDashboard from './pages/StudentDashboard'
 
 export const serverUrl = "http://localhost:8000"
 
@@ -52,6 +53,7 @@ function App() {
 
             {/* course */}
             <Route path='/dashboard' element={userData?.role === "educator" ? <Dashboard/> : <Navigate to="/"/>}/>
+            <Route path='/dashboardstudent' element={userData?.role === "student" ? <StudentDashboard/> : <Navigate to="/"/>}/>
 
             <Route path='/courses' element={userData?.role === "educator" ? <Courses/> : <Navigate to="/"/>}/>
 

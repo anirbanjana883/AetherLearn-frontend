@@ -56,3 +56,44 @@ html {
 .animate-float { animation: float linear infinite; }
 
 
+/* --- Heatmap Styles (LeetCode/GFG Green Theme) --- */
+
+/* Base styles for the calendar text (month and day labels) */
+.react-calendar-heatmap text {
+  font-size: 10px;
+  fill: #9ca3af; /* Light gray color */
+}
+
+/* Color for empty (no activity) squares */
+.react-calendar-heatmap .color-empty {
+  fill: #2d2d2d; /* Dark charcoal color */
+}
+
+/* Green color scale for activity levels */
+/* Least active */
+.react-calendar-heatmap .color-scale-1 { 
+  fill: #37a169; 
+} 
+/* Moderately active */
+.react-calendar-heatmap .color-scale-2 { 
+  fill: #48bb78; 
+} 
+/* More active */
+.react-calendar-heatmap .color-scale-3 { 
+  fill: #68d391; 
+} 
+/* Most active */
+.react-calendar-heatmap .color-scale-4 { 
+  fill: #9ae6b4; 
+} 
+
+/* --- Themed Tooltip Styles --- */
+#heatmap-tooltip {
+    background-color: #1a202c !important; /* Dark gray background */
+    border: 1px solid #4a5568 !important;   /* Gray border */
+    color: #e2e8f0 !important;             /* Light gray text */
+    opacity: 1 !important;
+    font-weight: bold !important;
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+}

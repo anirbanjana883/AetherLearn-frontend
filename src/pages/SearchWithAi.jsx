@@ -153,17 +153,33 @@ function SearchWithAi() {
           <>
             <h2 className="text-2xl font-bold text-slate-200 text-center mb-8">AI Search Results</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {recommendation.map((course) => (
-                <div key={course._id} className="transition-transform duration-300 hover:-translate-y-2">
-                  <Card
-                    thumbnail={course?.thumbnail}
-                    title={course?.title}
-                    category={course?.category}
-                    price={course?.price}
-                    id={course?._id}
-                    reviews={course?.reviews}
-                  />
+              {recommendation.map((course,index) => (
+                <div
+                key={index}
+                className="group relative bg-[#0A0F1C] rounded-2xl overflow-hidden shadow-[0_0_15px_rgba(37,99,235,0.3)] 
+                           hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] transition-all duration-300 border border-blue-500/40 
+                           hover:-translate-y-2 cursor-pointer flex flex-col"
+              >
+                <img src={course?.thumbnail} alt={course?.title} className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105" />
+                <div className="p-5 flex flex-col flex-grow">
+                  <span className="inline-block px-3 py-1 mb-3 bg-[#111827] text-blue-300 rounded-full text-xs font-medium border border-blue-500/50 w-fit">
+                    {course?.category}
+                  </span>
+                  <h2 className="text-lg font-semibold text-blue-400 leading-tight line-clamp-2 h-14" title={course?.title}>
+                    {course?.title}
+                  </h2>
+                  <p className="text-sm text-slate-400 mb-4">{course?.level}</p>
+                  
+                  {/* Explore Course Button */}
+                  <button
+                    className="w-full mt-auto px-4 py-3 bg-blue-600 border border-blue-600 text-white rounded-lg text-base font-semibold 
+                               transition-all duration-300 hover:bg-blue-700 hover:shadow-[0_0_15px_rgba(59,130,246,0.8)] cursor-pointer"
+                    onClick={() => navigate(`/viewcourse/${course._id}`)}
+                  >
+                    Explore Course
+                  </button>
                 </div>
+              </div>
               ))}
             </div>
           </>

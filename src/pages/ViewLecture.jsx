@@ -6,6 +6,7 @@ import { serverUrl } from "../App";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { FaPlayCircle } from "react-icons/fa";
 import ModernVideoPlayer from "../component/ModernVideoPlayer";
+import { toast } from "react-toastify";
 
 function ViewLecture() {
   const { courseId } = useParams();
@@ -35,12 +36,39 @@ function ViewLecture() {
     handleCreator();
   }, [selectedCourse?.creator]);
 
+  const handleVideoEnd = async () => {
+    // Make sure a lecture is selected before proceeding
+    if (!selectedLecture) return;
+
+    // console.log("Video has ended! Attempting to mark progress...");
+
+    try {
+      // Call the new backend endpoint to mark progress
+      const userDate = new Date().toISOString().split("T")[0];
+      await axios.post(
+        serverUrl + "/api/course/complete",
+        { lectureId: selectedLecture._id, date: userDate }, // Send the lecture ID in the body
+        { withCredentials: true }
+      );
+      // const dataToSend = {
+      //   lectureId: selectedLecture._id,
+      //   date: userDate,
+      // };
+      // console.log("Sending to backend:", dataToSend);
+      // console.log(
+      //   `Progress successfully marked for lecture: ${selectedLecture.lectureTitle}`
+      // );
+      toast.success("Progress Saved!"); // Notify the user
+    } catch (error) {
+      console.error("Failed to mark progress", error);
+      toast.error("Could not save progress.");
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-[#030712] text-white flex flex-col md:flex-row gap-6 p-4 md:p-8 font-inter">
-
       {/* LEFT SECTION */}
       <div className="relative w-full md:w-2/3 bg-[#0A0F1C] rounded-2xl border border-blue-500/40 shadow-[0_0_30px_rgba(37,99,235,0.3)] p-6 transition-all duration-500 hover:shadow-[0_0_45px_rgba(37,99,235,0.6)]">
-
         {/* Header */}
         <div className="mb-5 flex items-center gap-4">
           <button
@@ -66,7 +94,10 @@ function ViewLecture() {
         {/* Video Player */}
         <div className="aspect-video relative rounded-xl overflow-hidden mb-4 border border-blue-600 shadow-[0_0_25px_rgba(37,99,235,0.5)]">
           {selectedLecture?.videoUrl ? (
-            <ModernVideoPlayer src={selectedLecture.videoUrl} />
+            <ModernVideoPlayer
+              src={selectedLecture.videoUrl}
+              onEnded={handleVideoEnd}
+            />
           ) : (
             <div className="flex items-center justify-center h-full text-white text-lg">
               No Content from Instructor
@@ -83,7 +114,6 @@ function ViewLecture() {
 
       {/* RIGHT SECTION */}
       <div className="relative w-full md:w-1/3 bg-[#0A0F1C] rounded-2xl border border-blue-500/40 shadow-[0_0_25px_rgba(37,99,235,0.3)] p-6 transition-all duration-500 hover:shadow-[0_0_35px_rgba(37,99,235,0.6)] h-fit">
-
         <h2 className="text-xl font-bold mb-6 text-blue-400 drop-shadow-[0_0_8px_rgba(37,99,235,0.8)]">
           All Lectures
         </h2>
