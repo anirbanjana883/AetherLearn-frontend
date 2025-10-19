@@ -40,13 +40,14 @@ function EditProfile() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#030712] px-4 py-10 font-inter text-white">
+      <FaArrowLeftLong
+          className="absolute top-[5%] left-[5%] w-7 h-7 text-blue-400 cursor-pointer hover:scale-110 transition-transform "
+          onClick={() => navigate("/profile")}
+        />
       <div className="bg-[#0A0F1C] rounded-2xl shadow-[0_0_25px_rgba(37,99,235,0.3)] hover:shadow-[0_0_45px_rgba(37,99,235,0.6)] p-8 max-w-xl w-full relative border border-blue-500/40 transition-all duration-500">
         
         {/* Back button */}
-        <FaArrowLeftLong
-          className="absolute top-[5%] left-[5%] w-7 h-7 text-blue-400 cursor-pointer hover:scale-110 transition-transform"
-          onClick={() => navigate("/profile")}
-        />
+        
 
         <h2 className="text-2xl font-bold text-center text-blue-400 drop-shadow-[0_0_5px_rgba(37,99,235,0.9)] mb-6">
           Edit Profile
