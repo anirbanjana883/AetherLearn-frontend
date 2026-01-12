@@ -30,7 +30,9 @@ function SignUp() {
         { name, password, email, role },
         { withCredentials: true }
       );
-      dispatch(setUserData(result.data));
+
+      dispatch(setUserData(result.data.data));
+
       navigate("/");
       toast.success("Signup Successfully");
     } catch (error) {

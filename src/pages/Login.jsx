@@ -28,7 +28,9 @@ function Login() {
         { email, password },
         { withCredentials: true }
       );
-      dispatch(setUserData(result.data));
+
+      dispatch(setUserData(result.data.data));
+      
       toast.success("Login Successfully");
       navigate("/");
     } catch (error) {

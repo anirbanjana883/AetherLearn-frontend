@@ -16,7 +16,7 @@ const getCurrentUser = () => {
           withCredentials: true,
         });
         // console.log(result.data)
-        dispatch(setUserData(result.data));
+        dispatch(setUserData(result.data.data));
       } catch (error) {
         if (error.response?.status === 400) {
           dispatch(setUserData(null)); // user not logged in, ignore console error
