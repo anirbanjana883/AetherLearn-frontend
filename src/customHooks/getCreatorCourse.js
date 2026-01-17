@@ -15,7 +15,7 @@ function getCreatorCourse() {
                     {withCredentials : true}
                 )
                 console.log((result.data))
-                dispatch(setCreatorCourseData(result.data))
+                dispatch(setCreatorCourseData(result.data.data));
             } catch (error) {
                 console.log(error)
             }

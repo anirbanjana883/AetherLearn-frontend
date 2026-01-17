@@ -14,7 +14,7 @@ function StatsBar() {
     const fetchStats = async () => {
       try {
         const result = await axios.get(`${serverUrl}/api/stats/student`, { withCredentials: true });
-        setStats(result.data);
+        setStats(result.data.data);
       } catch (error) {
         console.error("Failed to fetch stats", error);
       }

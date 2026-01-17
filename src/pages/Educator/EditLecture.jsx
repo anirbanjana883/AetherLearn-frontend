@@ -3,7 +3,7 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { serverUrl } from "../../App";
+import { serverUrl } from "../../App"; // Adjust path if needed
 import { useDispatch, useSelector } from "react-redux";
 import { setLectureData } from "../../redux/lectureSlice";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -11,7 +11,11 @@ import ClipLoader from "react-spinners/ClipLoader";
 function EditLecture() {
   const { courseId, lectureId } = useParams();
   const { lectureData } = useSelector((state) => state.lecture);
-  const selectedLecture = lectureData.find((lecture) => lecture._id === lectureId);
+  
+  // 🛡️ Safety Check: Ensure lectureData is an array
+  const selectedLecture = Array.isArray(lectureData) 
+    ? lectureData.find((lecture) => lecture._id === lectureId)
+    : null;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -42,9 +46,12 @@ function EditLecture() {
         { withCredentials: true }
       );
 
+      // ✅ FIX: Use result.data.data (the actual lecture object)
+      // The backend response is now { success: true, data: {...}, message: "..." }
       const updatedLectures = lectureData.map((lecture) =>
-        lecture._id === lectureId ? result.data : lecture
+        lecture._id === lectureId ? result.data.data : lecture
       );
+      
       dispatch(setLectureData(updatedLectures));
 
       toast.success("Lecture updated successfully!");
@@ -64,7 +71,10 @@ function EditLecture() {
         withCredentials: true,
       });
       toast.success("Lecture removed successfully!");
+      
+      // ✅ This logic is still fine as it uses the ID from params
       dispatch(setLectureData(lectureData.filter((l) => l._id !== lectureId)));
+      
       navigate(`/createlecture/${courseId}`);
     } catch (error) {
       console.log(error);

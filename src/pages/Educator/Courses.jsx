@@ -20,7 +20,7 @@ function Courses() {
         const result = await axios.get(serverUrl + "/api/course/getcreator", {
           withCredentials: true,
         });
-        dispatch(setCreatorCourseData(result.data));
+        dispatch(setCreatorCourseData(result.data.data));
       } catch (error) {
         console.log(error);
       }

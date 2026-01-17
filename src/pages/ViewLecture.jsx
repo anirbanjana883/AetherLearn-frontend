@@ -11,12 +11,24 @@ import { toast } from "react-toastify";
 function ViewLecture() {
   const { courseId } = useParams();
   const { courseData } = useSelector((state) => state.course);
-  const selectedCourse = courseData?.find((course) => course._id == courseId);
+
+  // 🛡️ SAFETY CHECK: Ensure courseData is an array before using .find()
+  // This prevents a crash if Redux accidentally stores the full API object
+  const selectedCourse = Array.isArray(courseData) 
+    ? courseData.find((course) => course._id == courseId)
+    : null;
+
   const [creatorData, setCreatorData] = useState(null);
-  const [selectedLecture, setSelectedLecture] = useState(
-    selectedCourse?.lectures?.[0] || null
-  );
+  const [selectedLecture, setSelectedLecture] = useState(null);
+  
   const navigate = useNavigate();
+
+  // Initialize selected lecture once course is found
+  useEffect(() => {
+    if (selectedCourse?.lectures?.length > 0 && !selectedLecture) {
+      setSelectedLecture(selectedCourse.lectures[0]);
+    }
+  }, [selectedCourse]);
 
   useEffect(() => {
     const handleCreator = async () => {
@@ -27,7 +39,8 @@ function ViewLecture() {
             { userId: selectedCourse?.creator },
             { withCredentials: true }
           );
-          setCreatorData(result.data);
+          // ✅ CORRECT: Backend returns { data: { user } }
+          setCreatorData(result.data.data);
         } catch (error) {
           console.log(error);
         }
@@ -37,31 +50,22 @@ function ViewLecture() {
   }, [selectedCourse?.creator]);
 
   const handleVideoEnd = async () => {
-    // Make sure a lecture is selected before proceeding
     if (!selectedLecture) return;
 
-    // console.log("Video has ended! Attempting to mark progress...");
-
     try {
-      // Call the new backend endpoint to mark progress
       const userDate = new Date().toISOString().split("T")[0];
+      
       await axios.post(
         serverUrl + "/api/course/complete",
-        { lectureId: selectedLecture._id, date: userDate }, // Send the lecture ID in the body
+        { lectureId: selectedLecture._id, date: userDate },
         { withCredentials: true }
       );
-      // const dataToSend = {
-      //   lectureId: selectedLecture._id,
-      //   date: userDate,
-      // };
-      // console.log("Sending to backend:", dataToSend);
-      // console.log(
-      //   `Progress successfully marked for lecture: ${selectedLecture.lectureTitle}`
-      // );
-      toast.success("Progress Saved!"); // Notify the user
+      
+      toast.success("Progress Saved!");
     } catch (error) {
       console.error("Failed to mark progress", error);
-      toast.error("Could not save progress.");
+      // Optional: Don't annoy user with error toast if it's just a network blip
+      // toast.error("Could not save progress.");
     }
   };
 
@@ -78,16 +82,16 @@ function ViewLecture() {
             <FaArrowLeftLong className="text-lg text-blue-400" />
           </button>
           <h2 className="text-2xl md:text-3xl font-extrabold text-blue-400 drop-shadow-[0_0_5px_rgba(37,99,235,0.9)]">
-            {selectedCourse?.title}
+            {selectedCourse?.title || "Loading Course..."}
           </h2>
         </div>
 
         <div className="flex flex-wrap gap-3 text-sm text-gray-400 mb-5">
           <span className="px-3 py-1 bg-black border border-blue-500/50 rounded-full text-blue-300">
-            {selectedCourse?.category}
+            {selectedCourse?.category || "Category"}
           </span>
           <span className="px-3 py-1 bg-black border border-cyan-500/50 rounded-full text-cyan-300">
-            Level: {selectedCourse?.level}
+            Level: {selectedCourse?.level || "All"}
           </span>
         </div>
 
@@ -100,7 +104,7 @@ function ViewLecture() {
             />
           ) : (
             <div className="flex items-center justify-center h-full text-white text-lg">
-              No Content from Instructor
+              {selectedCourse ? "Select a Lecture to Play" : "Loading Content..."}
             </div>
           )}
         </div>
@@ -167,9 +171,9 @@ function ViewLecture() {
                 <h2 className="text-base font-medium text-white">
                   {creatorData?.name}
                 </h2>
-                <p className="text-sm text-gray-400 line-clamp-2">
+                <h2 className="text-sm text-gray-400 line-clamp-2">
                   {creatorData?.description}
-                </p>
+                </h2>
                 <p className="text-sm text-gray-500 italic">
                   {creatorData?.email}
                 </p>

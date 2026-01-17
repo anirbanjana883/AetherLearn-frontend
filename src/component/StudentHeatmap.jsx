@@ -29,7 +29,7 @@ function StudentHeatmap() {
         const result = await axios.get(`${serverUrl}/api/progress`, {
           withCredentials: true,
         });
-        setData(result.data);
+        setData(result.data.data);
       } catch (error) {
         console.error("Could not fetch progress data", error);
       }

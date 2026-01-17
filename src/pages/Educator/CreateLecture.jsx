@@ -25,14 +25,22 @@ function CreateLecture() {
         { lectureTitle },
         { withCredentials: true }
       );
-      dispatch(setLectureData([...lectureData, result.data.lecture]));
+      
+      // ✅ FIX 1: Access result.data.data.lecture
+      // The backend returns { data: { lecture: {...}, course: {...} } }
+      const newLecture = result.data.data.lecture;
+      
+      // Safely update Redux state
+      const currentLectures = Array.isArray(lectureData) ? lectureData : [];
+      dispatch(setLectureData([...currentLectures, newLecture]));
+      
       setLoading(false);
       toast.success("Lecture created successfully");
       setLectureTitle("");
     } catch (error) {
       setLoading(false);
       console.log(error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to create lecture");
     }
   };
 
@@ -43,13 +51,18 @@ function CreateLecture() {
           serverUrl + `/api/course/courselecture/${courseId}`,
           { withCredentials: true }
         );
-        dispatch(setLectureData(result?.data.lectures));
+        
+        // ✅ FIX 2: Access result.data.data.lectures
+        // The backend returns the Course object which has a .lectures array
+        const fetchedLectures = result.data.data.lectures;
+        
+        dispatch(setLectureData(fetchedLectures));
       } catch (error) {
         console.log(error);
       }
     };
     getCourseLecture();
-  }, []);
+  }, [courseId, dispatch]);
 
   return (
     <div className="min-h-screen bg-[#030712] text-white flex items-center justify-center p-4">
@@ -100,7 +113,7 @@ function CreateLecture() {
 
         {/* Lecture List */}
         <div className="space-y-2">
-          {lectureData?.map((lecture, index) => (
+          {Array.isArray(lectureData) && lectureData.map((lecture, index) => (
             <div
               key={index}
               className="bg-[#0B1324] rounded-xl flex justify-between items-center p-3 text-sm border border-blue-500/30 hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] transition-all duration-300"
@@ -116,6 +129,10 @@ function CreateLecture() {
               />
             </div>
           ))}
+          {/* Empty State */}
+          {(!lectureData || lectureData.length === 0) && (
+             <p className="text-center text-gray-500 py-4">No lectures added yet.</p>
+          )}
         </div>
       </div>
     </div>

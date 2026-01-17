@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeftLong } from "react-icons/fa6";
+import { IoPersonCircleSharp } from "react-icons/io5"; // ✅ Added missing import
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 function Dashboard() {
@@ -9,24 +10,24 @@ function Dashboard() {
   const navigate = useNavigate();
   const { creatorCourseData } = useSelector((state) => state.course);
 
-  const CourseProgressData =
-    creatorCourseData?.map((course) => ({
+  // 🛡️ SAFETY CHECK: Ensure data is an array before mapping
+  const safeCourseData = Array.isArray(creatorCourseData) ? creatorCourseData : [];
+
+  const CourseProgressData = safeCourseData.map((course) => ({
       name: course?.title?.slice(0, 10) + "...",
       lectures: course?.lectures?.length || 0,
-    })) || [];
+  }));
 
-  const EnrollData =
-    creatorCourseData?.map((course) => ({
+  const EnrollData = safeCourseData.map((course) => ({
       name: course?.title?.slice(0, 10) + "...",
       enrolled: course?.enrolledStudent?.length || 0,
-    })) || [];
+  }));
 
-  const totalEarning =
-    creatorCourseData?.reduce((sum, course) => {
+  const totalEarning = safeCourseData.reduce((sum, course) => {
       const studentCount = course.enrolledStudent?.length || 0;
       const courseRevenue = course.price ? course.price * studentCount : 0;
       return sum + courseRevenue;
-    }, 0) || 0;
+  }, 0);
 
   return (
     <div className="flex min-h-screen bg-[#030712] text-white">
@@ -42,7 +43,7 @@ function Dashboard() {
               <img src={userData.photoUrl} alt="profile" className="w-30 h-30 rounded-full object-cover border-2 border-blue-500/50 transition-all duration-300 hover:border-cyan-400"/>
             ) : userData ? (
               <div className="w-30 h-30 rounded-full text-white flex items-center justify-center text-5xl font-bold border-2 border-blue-500/50 bg-gray-900 transition-all duration-300 hover:border-cyan-400">
-                {userData.name.slice(0, 1).toUpperCase()}
+                {userData.name?.slice(0, 1).toUpperCase()}
               </div>
             ) : (
               <IoPersonCircleSharp className="w-14 h-14 text-slate-400 transition-colors duration-300 hover:text-cyan-400"/>
@@ -77,18 +78,22 @@ function Dashboard() {
             <h2 className="text-lg font-semibold mb-4 text-blue-400 drop-shadow-[0_0_5px_rgba(37,99,235,0.9)]">
               COURSE PROGRESS (LECTURES)
             </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={CourseProgressData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                <XAxis dataKey="name" stroke="#60a5fa" />
-                <YAxis stroke="#60a5fa" />
-                <Tooltip
-                  contentStyle={{ backgroundColor: "#111827", borderRadius: "8px", border: "1px solid #2563eb" }}
-                  itemStyle={{ color: "#fff" }}
-                />
-                <Bar dataKey="lectures" fill="#2563eb" radius={[5, 5, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {CourseProgressData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={CourseProgressData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                  <XAxis dataKey="name" stroke="#60a5fa" />
+                  <YAxis stroke="#60a5fa" />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: "#111827", borderRadius: "8px", border: "1px solid #2563eb" }}
+                    itemStyle={{ color: "#fff" }}
+                  />
+                  <Bar dataKey="lectures" fill="#2563eb" radius={[5, 5, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+               <p className="text-center text-gray-500 py-10">No course data available.</p>
+            )}
           </div>
 
           {/* enrollment analytics */}
@@ -96,18 +101,22 @@ function Dashboard() {
             <h2 className="text-lg font-semibold mb-4 text-blue-400 drop-shadow-[0_0_5px_rgba(37,99,235,0.9)]">
               STUDENT ENROLLMENT
             </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={EnrollData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                <XAxis dataKey="name" stroke="#60a5fa" />
-                <YAxis stroke="#60a5fa" />
-                <Tooltip
-                  contentStyle={{ backgroundColor: "#111827", borderRadius: "8px", border: "1px solid #2563eb" }}
-                  itemStyle={{ color: "#fff" }}
-                />
-                <Bar dataKey="enrolled" fill="#2563eb" radius={[5, 5, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {EnrollData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={EnrollData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                  <XAxis dataKey="name" stroke="#60a5fa" />
+                  <YAxis stroke="#60a5fa" />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: "#111827", borderRadius: "8px", border: "1px solid #2563eb" }}
+                    itemStyle={{ color: "#fff" }}
+                  />
+                  <Bar dataKey="enrolled" fill="#2563eb" radius={[5, 5, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+               <p className="text-center text-gray-500 py-10">No enrollment data available.</p>
+            )}
           </div>
         </div>
       </div>

@@ -29,7 +29,9 @@ function AllCourses() {
   };
 
   useEffect(() => {
-    let courseCopy = courseData ? [...courseData] : [];
+    // 🛡️ SAFETY CHECK: Ensure courseData is an array before spreading
+    let courseCopy = Array.isArray(courseData) ? [...courseData] : [];
+    
     if (category.length > 0) {
       courseCopy = courseCopy.filter((c) => category.includes(c.category));
     }
@@ -45,7 +47,7 @@ function AllCourses() {
         className="lg:hidden fixed top-24 left-4 z-30 flex items-center gap-2 px-4 py-2 rounded-full
                    bg-[#0A0F1C]/60 backdrop-blur-md border border-blue-500/40 text-cyan-300
                    shadow-[0_0_20px_rgba(37,99,235,0.3)]"
-        onClick={() => setVisibleSideBar(true)} // Directly open sidebar
+        onClick={() => setVisibleSideBar(true)} 
       >
         <FaFilter />
         <span>Filters</span>

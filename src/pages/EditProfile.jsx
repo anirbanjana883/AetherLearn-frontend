@@ -11,8 +11,11 @@ import axios from "axios";
 function EditProfile() {
   const navigate = useNavigate();
   const { userData } = useSelector((state) => state.user);
-  const [name, setName] = useState(userData.name || "");
-  const [description, setDescription] = useState(userData.description || "");
+  
+  // 🛡️ SAFETY FIX: Added optional chaining (?.) to prevent crashes on refresh
+  const [name, setName] = useState(userData?.name || "");
+  const [description, setDescription] = useState(userData?.description || "");
+  
   const [photoUrl, setPhotoUrl] = useState(null);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -28,7 +31,10 @@ function EditProfile() {
       const result = await axios.post(`${serverUrl}/api/user/profile`, formData, {
         withCredentials: true,
       });
-      dispatch(setUserData(result.data));
+
+      // ✅ FIX: Extract the user object from the data wrapper
+      dispatch(setUserData(result.data.data));
+      
       setLoading(false);
       navigate("/profile");
       toast.success("Profile updated successfully");
@@ -46,9 +52,6 @@ function EditProfile() {
         />
       <div className="bg-[#0A0F1C] rounded-2xl shadow-[0_0_25px_rgba(37,99,235,0.3)] hover:shadow-[0_0_45px_rgba(37,99,235,0.6)] p-8 max-w-xl w-full relative border border-blue-500/40 transition-all duration-500">
         
-        {/* Back button */}
-        
-
         <h2 className="text-2xl font-bold text-center text-blue-400 drop-shadow-[0_0_5px_rgba(37,99,235,0.9)] mb-6">
           Edit Profile
         </h2>

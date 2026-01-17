@@ -21,7 +21,7 @@ function AchievementsPanel() {
     const fetchAchievements = async () => {
       try {
         const result = await axios.get(`${serverUrl}/api/achievements/my-achievements`, { withCredentials: true });
-        setAchievements(result.data);
+        setAchievements(result.data.data);
       } catch (error) {
         console.error("Failed to fetch achievements", error);
       } finally {

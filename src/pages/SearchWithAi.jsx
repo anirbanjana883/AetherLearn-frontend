@@ -74,7 +74,7 @@ function SearchWithAi() {
         { input: query },
         { withCredentials: true }
       );
-      setRecommendation(result.data);
+      setRecommendation(result.data.data);
       if (result.data.length > 0) {
         speak("These are the top courses I found for you.");
       } else {

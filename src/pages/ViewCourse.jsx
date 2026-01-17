@@ -49,7 +49,8 @@ function ViewCourse() {
             { userId: selectedCourse.creator },
             { withCredentials: true }
           );
-          setCreatorData(result.data);
+          // ✅ CORRECT: user is inside result.data.data
+          setCreatorData(result.data.data);
         } catch (error) {
           console.log(error);
         }
@@ -75,6 +76,7 @@ function ViewCourse() {
   };
   const avgRating = calculateAvgReview(selectedCourse?.reviews);
 
+  // 🔴 CRITICAL FIX HERE: Payment Handling
   const handleEnroll = async (userId, courseId) => {
     try {
       const orderData = await axios.post(
@@ -83,13 +85,16 @@ function ViewCourse() {
         { withCredentials: true }
       );
 
+      // ✅ FIX: Extract the inner data object
+      const order = orderData.data.data; 
+
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: orderData.data.amount,
+        amount: order.amount, // ✅ Now accessing correct path
         currency: "INR",
         name: "AETHERLEARN",
         description: "COURSE ENROLLMENT PAYMENT",
-        order_id: orderData.data.id,
+        order_id: order.id,   // ✅ Now accessing correct path
         handler: async function (response) {
           try {
             const verify = await axios.post(
@@ -109,6 +114,7 @@ function ViewCourse() {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (error) {
+      console.error(error);
       toast.error("Enrollment failed.");
     }
   };
