@@ -1,13 +1,44 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Card from "./Card";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { setCourseData } from "../redux/courseSlice";
 
 function CardPge() {
+  const dispatch = useDispatch();
   const { courseData } = useSelector((state) => state.course);
   const [popularCourses, setPopularCourses] = useState([]);
 
+  // ✅ 1. FETCH LOGIC (Clean Version)
+  // Ensures data exists if user lands on Home first
+  useEffect(() => {
+    const fetchCoursesIfNeeded = async () => {
+      // Only fetch if Redux is empty
+      if (!courseData || courseData.length === 0) {
+        try {
+          const result = await axios.get(
+            `${serverUrl}/api/course/getpublished`,
+            { withCredentials: true }
+          );
+
+          if (result.data.success) {
+            dispatch(setCourseData(result.data.data));
+          }
+        } catch (error) {
+          console.error("Failed to fetch popular courses:", error);
+        }
+      }
+    };
+
+    fetchCoursesIfNeeded();
+  }, [dispatch, courseData]);
+
+  // ✅ 2. SLICE LOGIC
+  // Updates local state whenever Redux data arrives
   useEffect(() => {
     if (Array.isArray(courseData) && courseData.length > 0) {
+      // Take the first 6 courses for the "Popular" section
       setPopularCourses(courseData.slice(0, 6));
     } else {
       setPopularCourses([]);
@@ -30,33 +61,35 @@ function CardPge() {
         </p>
       </div>
 
-      {/* Horizontal Scroll Container with Fading Edges */}
+      {/* Cards Container */}
       <div className="relative w-full max-w-7xl mt-12">
         {/* Left Fade */}
         <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#030712] to-transparent z-10 pointer-events-none hidden md:block"></div>
         {/* Right Fade */}
         <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#030712] to-transparent z-10 pointer-events-none hidden md:block"></div>
 
-        <div
-          className="w-full flex gap-6 lg:gap-8 overflow-x-auto overflow-y-hidden px-6 lg:px-12 py-8 
-                     snap-x snap-mandatory 
-                     scrollbar-thin scrollbar-thumb-blue-600/50 hover:scrollbar-thumb-blue-500/80 scrollbar-track-transparent"
-        >
-          {popularCourses?.map((course, index) => (
-            <div
-              key={index}
-              className="flex-shrink-0 w-[280px] sm:w-[300px] snap-center transition-transform duration-300 hover:-translate-y-2"
-            >
-              <Card
-                thumbnail={course?.thumbnail}
-                title={course?.title}
-                category={course?.category}
-                price={course?.price}
-                id={course?._id}
-                reviews={course?.reviews}
-              />
+        <div className="w-full flex gap-6 lg:gap-8 overflow-x-auto overflow-y-hidden px-6 lg:px-12 py-8 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-blue-600/50 hover:scrollbar-thumb-blue-500/80 scrollbar-track-transparent">
+          {popularCourses.length > 0 ? (
+            popularCourses.map((course, index) => (
+              <div
+                key={index}
+                className="flex-shrink-0 w-[280px] sm:w-[300px] snap-center transition-transform duration-300 hover:-translate-y-2"
+              >
+                <Card
+                  thumbnail={course?.thumbnail}
+                  title={course?.title}
+                  category={course?.category}
+                  price={course?.price}
+                  id={course?._id}
+                  reviews={course?.reviews}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="w-full text-center text-gray-500 italic py-10">
+               Loading popular courses...
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

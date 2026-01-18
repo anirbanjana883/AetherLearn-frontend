@@ -3,16 +3,52 @@ import Nav from "../component/Nav";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import aiimg from "../assets/SearchAi_bl.png";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux"; // 👈 Import Dispatch
 import Card from "../component/Card";
 import { FaFilter, FaTimes, FaGhost } from "react-icons/fa";
+import axios from "axios"; // 👈 Import Axios
+import { serverUrl } from "../App"; // 👈 Import Server URL
+import { setCourseData } from "../redux/courseSlice"; // 👈 Import Action
 
 function AllCourses() {
   const navigate = useNavigate();
+  const dispatch = useDispatch(); // 👈 Init Dispatch
   const { courseData } = useSelector((state) => state.course);
+  
   const [category, setCategory] = useState([]);
   const [filterCourses, setFilterCourses] = useState([]);
   const [visibleSideBar, setVisibleSideBar] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // ✅ 1. FETCH LOGIC (Now lives inside the page)
+  useEffect(() => {
+    const fetchPublishedCourses = async () => {
+      setLoading(true);
+      try {
+        const result = await axios.get(
+          `${serverUrl}/api/course/getpublished`,
+          { withCredentials: true }
+        );
+
+        // Debug: See if it comes from Cache or DB
+        console.log("Fetched Courses:", result.data);
+
+        // ✅ Correctly extracting the array
+        if (result.data.success) {
+           dispatch(setCourseData(result.data.data));
+        }
+      } catch (error) {
+        console.error("Failed to fetch courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Fetch only if we don't have data yet (Optional optimization)
+    // Or fetch every time to ensure freshness. Let's fetch every time for now.
+    fetchPublishedCourses();
+  }, [dispatch]);
+
 
   const categories = [
     "Web Development", "UI/UX Designing", "App Development",
@@ -28,8 +64,9 @@ function AllCourses() {
     );
   };
 
+  // ✅ 2. FILTER LOGIC
   useEffect(() => {
-    // 🛡️ SAFETY CHECK: Ensure courseData is an array before spreading
+    // Safety Check: Ensure courseData is an array
     let courseCopy = Array.isArray(courseData) ? [...courseData] : [];
     
     if (category.length > 0) {
@@ -120,11 +157,13 @@ function AllCourses() {
       </aside>
 
       {/* Main Content Area */}
-      <main
-        className="w-full transition-all duration-300 pt-32 pb-16 lg:pl-[320px]"
-      >
+      <main className="w-full transition-all duration-300 pt-32 pb-16 lg:pl-[320px]">
         <div className="px-4 sm:px-6">
-          {filterCourses?.length > 0 ? (
+          {loading && filterCourses.length === 0 ? (
+            <div className="flex items-center justify-center h-64">
+               <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : filterCourses?.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-8">
               {filterCourses.map((course) => (
                 <div key={course._id} className="transition-transform duration-300 hover:-translate-y-2">
