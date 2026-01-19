@@ -64,7 +64,7 @@ function ForgetPassowrd() {
       );
       setLoading(false);
       toast.success(result.data.message);
-      navigate("/login"); // Navigate to login on success
+      navigate("/login");
     } catch (error) {
       toast.error(error.response?.data?.message || "Password reset failed");
       setLoading(false);
@@ -109,7 +109,8 @@ function ForgetPassowrd() {
     }
   };
 
-  const { title, description, fields, buttonText, action } = renderStepContent();
+  // 👇 FIX 1: Add default values (= []) so variables are never undefined
+  const { title, description, fields = [], buttonText, action } = renderStepContent();
 
   return (
     <div className="w-full min-h-screen relative bg-[#030712] text-white flex items-center justify-center p-4">
@@ -131,7 +132,8 @@ function ForgetPassowrd() {
           </div>
 
           <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-            {fields.map(field => (
+            {/* 👇 FIX 2: Use Optional Chaining (?.) just to be safe */}
+            {fields?.map(field => (
               <div key={field.id} className="relative">
                 <label htmlFor={field.id} className="font-semibold text-slate-300 text-sm mb-1 block">{field.label}</label>
                 <input
@@ -154,8 +156,8 @@ function ForgetPassowrd() {
 
             <button
               className="w-full p-3 mt-6 bg-blue-600 text-white font-bold rounded-lg flex items-center justify-center
-                         transition-all duration-300 hover:bg-blue-700 hover:shadow-[0_0_20px_rgba(59,130,246,0.8)]
-                         disabled:bg-blue-800 disabled:cursor-not-allowed"
+                          transition-all duration-300 hover:bg-blue-700 hover:shadow-[0_0_20px_rgba(59,130,246,0.8)]
+                          disabled:bg-blue-800 disabled:cursor-not-allowed"
               disabled={loading}
               onClick={action}
             >
