@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Card from "./Card";
 import axios from "axios";
-import { serverUrl } from "../api/axios.js";
+import API, { serverUrl } from "../api/axios.js";
 import { setCourseData } from "../redux/courseSlice";
 
 function CardPge() {
@@ -10,29 +10,23 @@ function CardPge() {
   const { courseData } = useSelector((state) => state.course);
   const [popularCourses, setPopularCourses] = useState([]);
 
-  // ✅ 1. FETCH LOGIC (Clean Version)
-  // Ensures data exists if user lands on Home first
   useEffect(() => {
     const fetchCoursesIfNeeded = async () => {
-      // Only fetch if Redux is empty
       if (!courseData || courseData.length === 0) {
         try {
-          const result = await axios.get(
-            `${serverUrl}/api/course/getpublished`,
-            { withCredentials: true }
-          );
+          const result = await API.get("/course/getpublished");
 
           if (result.data.success) {
             dispatch(setCourseData(result.data.data));
           }
         } catch (error) {
-          console.error("Failed to fetch popular courses:", error);
+          console.error("Failed to fetch courses:", error);
         }
       }
     };
 
     fetchCoursesIfNeeded();
-  }, [dispatch, courseData]);
+  }, [dispatch]);
 
   // ✅ 2. SLICE LOGIC
   // Updates local state whenever Redux data arrives
@@ -56,8 +50,8 @@ function CardPge() {
           Our Popular Courses
         </h1>
         <p className="mt-4 max-w-2xl text-base md:text-lg text-slate-300 leading-relaxed">
-          Explore top-rated courses to boost your skills, advance your career, and
-          unlock opportunities in tech, AI, business, and beyond.
+          Explore top-rated courses to boost your skills, advance your career,
+          and unlock opportunities in tech, AI, business, and beyond.
         </p>
       </div>
 
@@ -87,7 +81,7 @@ function CardPge() {
             ))
           ) : (
             <div className="w-full text-center text-gray-500 italic py-10">
-               Loading popular courses...
+              Loading popular courses...
             </div>
           )}
         </div>

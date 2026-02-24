@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import { serverUrl } from "../../api/axios.js";
+import API, { serverUrl } from "../../api/axios.js";
 import { toast } from "react-toastify";
 import ClipLoader from "react-spinners/ClipLoader";
 import axios from "axios";
@@ -15,10 +15,8 @@ function CreateCourses() {
   const handleCreateCourse = async () => {
     setLoading(true);
     try {
-      const result = await axios.post(
-        serverUrl + "/api/course/create",
+      const result = await API.post("/course/create",
         { title, category },
-        { withCredentials: true }
       );
       navigate("/courses");
       setLoading(false);
