@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Card from "./Card";
 import axios from "axios";
-import { serverUrl } from "../App";
+import { serverUrl } from "../api/axios.js";
 import { setCourseData } from "../redux/courseSlice";
 
 function CardPge() {

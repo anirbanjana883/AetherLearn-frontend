@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { serverUrl } from "../App";
+import { serverUrl } from "../api/axios.js";
 import { setUserData } from "../redux/userSlice";
 import { toast } from "react-toastify";
 import ClipLoader from "react-spinners/ClipLoader";

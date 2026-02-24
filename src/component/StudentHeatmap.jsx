@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import axios from 'axios';
-import { serverUrl } from '../App';
+import { serverUrl } from "../api/axios.js";
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 // A simple hook to check screen width

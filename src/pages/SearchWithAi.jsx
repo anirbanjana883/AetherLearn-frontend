@@ -5,7 +5,7 @@ import { FaRobot, FaGhost } from "react-icons/fa6"; // Added FaGhost
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { serverUrl } from "../App";
+import { serverUrl } from "../api/axios.js";
 import click_snd from "../assets/start.mp3";
 import Card from "../component/Card"; // Using your consistent Card component
 

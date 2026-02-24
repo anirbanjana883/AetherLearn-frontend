@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo1 from "../assets/logo1.png";
 import { FaRegEye, FaRegEyeSlash, FaGoogle } from "react-icons/fa6"; // Added FaGoogle
 import axios from "axios";
-import { serverUrl } from "../App";
+import { serverUrl } from "../api/axios.js";
 import { toast } from "react-toastify";
 import ClipLoader from "react-spinners/ClipLoader";
 import { useDispatch } from "react-redux";
@@ -25,8 +25,7 @@ function SignUp() {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await axios.post(
-        serverUrl + "/api/auth/signup",
+      const result = await API.post("/auth/signup",
         { name, password, email, role },
         { withCredentials: true }
       );
@@ -48,12 +47,10 @@ function SignUp() {
       const response = await signInWithPopup(auth, provider);
       const user = response.user;
       const { displayName: name, email } = user;
-      const result = await axios.post(
-        serverUrl + "/api/auth/googleauth",
+      const result = await API.post("/auth/googleauth",
         { name, email, role },
-        { withCredentials: true }
       );
-      dispatch(setUserData(result.data));
+      dispatch(setUserData(result.data.data));
       navigate("/");
       toast.success("Signup Successfully");
     } catch (error) {

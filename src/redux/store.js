@@ -5,7 +5,7 @@ import lectureSlice from "./lectureSlice"
 import reviewSlice from "./reviewSlice"
 
 
-export const store = configureStore({
+const store = configureStore({
     reducer:{
         user:userSlice,
         course:courseSlice,
@@ -13,3 +13,5 @@ export const store = configureStore({
         review:reviewSlice
     }
 })
+
+export default store;

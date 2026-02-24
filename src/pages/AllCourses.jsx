@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux"; // 👈 Import Dispatch
 import Card from "../component/Card";
 import { FaFilter, FaTimes, FaGhost } from "react-icons/fa";
 import axios from "axios"; // 👈 Import Axios
-import { serverUrl } from "../App"; // 👈 Import Server URL
+import { serverUrl } from "../api/axios.js"; // 👈 Import Server URL
 import { setCourseData } from "../redux/courseSlice"; // 👈 Import Action
 
 function AllCourses() {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { serverUrl } from '../App';
+import { serverUrl } from "../api/axios.js";
 import { FaBook, FaTasks, FaFire } from 'react-icons/fa'; // Icons for stats
 
 function StatsBar() {

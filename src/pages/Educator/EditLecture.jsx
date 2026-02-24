@@ -3,7 +3,7 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { serverUrl } from "../../App"; // Adjust path if needed
+import { serverUrl } from "../../api/axios.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setLectureData } from "../../redux/lectureSlice";
 import ClipLoader from "react-spinners/ClipLoader";

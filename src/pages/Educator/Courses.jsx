@@ -5,7 +5,7 @@ import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import img from "../../assets/empty.jpg";
 import axios from "axios";
-import { serverUrl } from "../../App";
+import { serverUrl } from "../../api/axios.js";
 import { setCreatorCourseData } from "../../redux/courseSlice";
 
 function Courses() {

@@ -4,7 +4,7 @@ import google from "../assets/google.jpg";
 import { FaRegEye, FaRegEyeSlash, FaGoogle } from "react-icons/fa6"; // Added FaGoogle
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { serverUrl } from "../App";
+import API, { serverUrl } from "../api/axios.js";
 import ClipLoader from "react-spinners/ClipLoader";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
@@ -23,10 +23,8 @@ function Login() {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const result = await axios.post(
-        serverUrl + "/api/auth/login",
-        { email, password },
-        { withCredentials: true }
+      const result = await API.post("/auth/login",
+        { email, password }
       );
 
       dispatch(setUserData(result.data.data));
@@ -51,9 +49,8 @@ function Login() {
       const response = await signInWithPopup(auth, provider);
       const user = response.user;
       const { displayName: name, email } = user;
-      const result = await axios.post(serverUrl + "/api/auth/googleauth",
-        { name, email, role: "" },
-        { withCredentials: true }
+      const result = await API.post("/auth/googleauth",
+        { name, email, role: "" }
       );
       dispatch(setUserData(result.data));
       navigate("/");

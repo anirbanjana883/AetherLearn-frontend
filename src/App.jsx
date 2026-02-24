@@ -1,11 +1,12 @@
 import React from 'react' 
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import { useSelector } from 'react-redux'
+
+// Components & Pages
 import Home from './pages/Home'
 import SignUp from './pages/SignUp'
 import Login from './pages/Login'
-import { ToastContainer} from 'react-toastify'
-import getCurrentUser from './customHooks/getCurrentUser'
-import { useSelector } from 'react-redux'
 import Profile from './pages/Profile'
 import ForgetPassowrd from './pages/ForgetPassowrd'
 import EditProfile from './pages/EditProfile'
@@ -13,8 +14,6 @@ import Dashboard from './pages/Educator/Dashboard'
 import Courses from './pages/Educator/Courses'
 import EditCourse from './pages/Educator/EditCourse'
 import CreateCourses from './pages/Educator/CreateCourses'
-import getCreatorCourse from './customHooks/getCreatorCourse'
-// import getPublishedCourse from './customHooks/getPublishedCourse'
 import AllCourses from './pages/AllCourses'
 import CreateLecture from './pages/Educator/CreateLecture'
 import EditLecture from './pages/Educator/EditLecture'
@@ -22,56 +21,46 @@ import ViewCourse from './pages/ViewCourse'
 import ScrollToTop from './component/ScrollToTop'
 import ViewLecture from './pages/ViewLecture'
 import MyEnrolledCourse from './pages/MyEnrolledCourse'
-import getAllReviews from './customHooks/getAllReviews'
 import SearchWithAi from './pages/searchWithAi'
 import StudentDashboard from './pages/StudentDashboard'
-
-export const serverUrl = "http://localhost:8000"
+import ProtectedRoute from './routes/ProtectedRoute'
 
 function App() {
-  getCurrentUser()
-  getCreatorCourse()
-  // getPublishedCourse()
-  getAllReviews()
-  
-  const {userData} = useSelector(state=>state.user);
+  const { userData } = useSelector(state => state.user);
 
   return (
     <>  
-        <ToastContainer />
-        <ScrollToTop/>
-        <Routes>
-            <Route path='/' element={<Home/>}/>
-            <Route path='/signup' element={!userData ? <SignUp/> : <Navigate to={"/"}/>}/>
-            <Route path='/login' element={!userData ? <Login /> : <Navigate to={"/"} />} />
-            <Route path='/profile' element={userData ? <Profile/> : <Navigate to={"/login"}/>}/>
-            <Route path='/forget' element={!userData ? <ForgetPassowrd/> : <Navigate to="/"/>}/>
-            <Route path='/editprofile' element={userData ? <EditProfile/> : <Navigate to="/login"/>}/>
-            <Route path='/allcourses' element={userData ? <AllCourses/> : <Navigate to="/login"/>}/>
+      <ToastContainer />
+      <ScrollToTop/>
+      <Routes>
+        {/* Public Routes */}
+        <Route path='/' element={<Home/>}/>
+        <Route path='/signup' element={!userData ? <SignUp/> : <Navigate to="/"/>}/>
+        <Route path='/login' element={!userData ? <Login /> : <Navigate to="/" />} />
+        <Route path='/forget' element={!userData ? <ForgetPassowrd/> : <Navigate to="/"/>}/>
 
-            {/* educator */}
+        {/* General Protected Routes */}
+        <Route path='/profile' element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
+        <Route path='/editprofile' element={<ProtectedRoute><EditProfile/></ProtectedRoute>}/>
+        <Route path='/allcourses' element={<ProtectedRoute><AllCourses/></ProtectedRoute>}/>
+        <Route path='/viewcourse/:courseId' element={<ProtectedRoute><ViewCourse/></ProtectedRoute>}/>
+        <Route path='/viewlecture/:courseId' element={<ProtectedRoute><ViewLecture/></ProtectedRoute>}/>
+        <Route path='/mycourses' element={<ProtectedRoute><MyEnrolledCourse/></ProtectedRoute>}/>
+        <Route path='/search' element={<ProtectedRoute><SearchWithAi/></ProtectedRoute>}/>
 
-            {/* course */}
-            <Route path='/dashboard' element={userData?.role === "educator" ? <Dashboard/> : <Navigate to="/"/>}/>
-            <Route path='/dashboardstudent' element={userData?.role === "student" ? <StudentDashboard/> : <Navigate to="/"/>}/>
+        {/* Student Specific */}
+        <Route path='/dashboardstudent' element={
+          <ProtectedRoute role="student"><StudentDashboard/></ProtectedRoute>
+        }/>
 
-            <Route path='/courses' element={userData?.role === "educator" ? <Courses/> : <Navigate to="/"/>}/>
-
-            <Route path='/createcourse' element={userData?.role === "educator" ? <CreateCourses/> : <Navigate to="/"/>}/>
-
-            <Route path='/editcourse/:courseId' element={userData?.role === "educator" ? <EditCourse/> : <Navigate to="/"/>}/>
-
-            {/* lecture */}
-            <Route path='/createlecture/:courseId' element={userData?.role === "educator" ? <CreateLecture/> : <Navigate to="/"/>}/>
-
-            <Route path='/editlecture/:courseId/:lectureId' element={userData?.role === "educator" ? <EditLecture/> : <Navigate to="/"/>}/>
-
-            <Route path='/viewcourse/:courseId' element={userData ? <ViewCourse/> : <Navigate to="/login"/>}/>
-            <Route path='/viewlecture/:courseId' element={userData ? <ViewLecture/> : <Navigate to="/login"/>}/>
-            <Route path='/mycourses' element={userData ? <MyEnrolledCourse/> : <Navigate to="/login"/>}/>
-            <Route path='/search' element={userData ? <SearchWithAi/> : <Navigate to="/login"/>}/>
-
-        </Routes>
+        {/* Educator Specific */}
+        <Route path='/dashboard' element={<ProtectedRoute role="educator"><Dashboard/></ProtectedRoute>}/>
+        <Route path='/courses' element={<ProtectedRoute role="educator"><Courses/></ProtectedRoute>}/>
+        <Route path='/createcourse' element={<ProtectedRoute role="educator"><CreateCourses/></ProtectedRoute>}/>
+        <Route path='/editcourse/:courseId' element={<ProtectedRoute role="educator"><EditCourse/></ProtectedRoute>}/>
+        <Route path='/createlecture/:courseId' element={<ProtectedRoute role="educator"><CreateLecture/></ProtectedRoute>}/>
+        <Route path='/editlecture/:courseId/:lectureId' element={<ProtectedRoute role="educator"><EditLecture/></ProtectedRoute>}/>
+      </Routes>
     </>
   )
 }

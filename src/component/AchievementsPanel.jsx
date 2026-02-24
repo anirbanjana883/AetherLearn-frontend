@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { serverUrl } from '../App';
+import { serverUrl } from "../api/axios.js";
 import { FaPlay, FaFire, FaCrown, FaBook, FaTasks, FaQuestionCircle } from 'react-icons/fa'; // Import all possible icons
 
 // --- Icon Map ---

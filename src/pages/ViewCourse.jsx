@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSelectedCourse } from "../redux/courseSlice";
 import { addEnrolledCourse } from "../redux/userSlice";
 import axios from "axios";
-import { serverUrl } from "../App";
+import { serverUrl } from "../api/axios.js";
 import Card from "../component/Card";
 import { toast } from "react-toastify";
 import ClipLoader from "react-spinners/ClipLoader";

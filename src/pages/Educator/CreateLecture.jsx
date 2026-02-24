@@ -4,7 +4,7 @@ import { FaEdit } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { serverUrl } from "../../App";
+import { serverUrl } from "../../api/axios.js";
 import ClipLoader from "react-spinners/ClipLoader";
 import { setLectureData } from "../../redux/lectureSlice";
 import { toast } from "react-toastify";

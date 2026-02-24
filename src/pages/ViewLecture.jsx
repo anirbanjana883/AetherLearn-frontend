@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { serverUrl } from "../App";
+import { serverUrl } from "../api/axios.js";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { FaPlayCircle } from "react-icons/fa";
 import ModernVideoPlayer from "../component/ModernVideoPlayer";

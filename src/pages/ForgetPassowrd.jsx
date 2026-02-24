@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { serverUrl } from "../App";
+import API, { serverUrl } from "../api/axios.js";
 import { toast } from "react-toastify";
 import ClipLoader from "react-spinners/ClipLoader";
 import { FaRegEye, FaRegEyeSlash, FaArrowLeftLong } from "react-icons/fa6";
@@ -20,11 +20,10 @@ function ForgetPassowrd() {
   const sendOtp = async () => {
     setLoading(true);
     try {
-      const result = await axios.post(
-        serverUrl + "/api/auth/sendotp",
-        { email },
-        { withCredentials: true }
+      const result = await API.post("/auth/sendotp",
+        { email }
       );
+      
       setLoading(false);
       setStep(2);
       toast.success(result.data.message);
@@ -37,11 +36,10 @@ function ForgetPassowrd() {
   const verifyOtp = async () => {
     setLoading(true);
     try {
-      const result = await axios.post(
-        serverUrl + "/api/auth/verifyotp",
-        { email, otp },
-        { withCredentials: true }
+      const result = await API.post("/auth/verifyotp",
+        { email, otp }
       );
+
       setLoading(false);
       setStep(3);
       toast.success(result.data.message);
@@ -51,25 +49,22 @@ function ForgetPassowrd() {
     }
   };
 
-  const resetPassword = async () => {
-    if (newPassword !== conPassword) {
-      return toast.error("Passwords do not match");
-    }
-    setLoading(true);
-    try {
-      const result = await axios.post(
-        serverUrl + "/api/auth/resetpassword",
-        { email, password: newPassword },
-        { withCredentials: true }
-      );
-      setLoading(false);
-      toast.success(result.data.message);
-      navigate("/login");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Password reset failed");
-      setLoading(false);
-    }
-  };
+const resetPassword = async () => {
+  if (newPassword !== conPassword) {
+    return toast.error("Passwords do not match");
+  }
+  setLoading(true);
+  try {
+    const result = await API.post("/auth/resetpassword", { email, password: newPassword });
+    
+    setLoading(false);
+    toast.success(result.data.message);
+    navigate("/login");
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Password reset failed");
+    setLoading(false);
+  }
+};
 
   const renderStepContent = () => {
     switch (step) {

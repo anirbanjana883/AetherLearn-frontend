@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import img from "../../assets/empty.jpg";
 import axios from "axios";
-import { serverUrl } from "../../App";
+import { serverUrl } from "../../api/axios.js";
 import { toast } from "react-toastify";
 import ClipLoader from "react-spinners/ClipLoader";
 import { setCourseData } from "../../redux/courseSlice";
