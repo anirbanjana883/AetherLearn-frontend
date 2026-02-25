@@ -5,7 +5,7 @@ import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import img from "../../assets/empty.jpg";
 import axios from "axios";
-import { serverUrl } from "../../api/axios.js";
+import API, { serverUrl } from "../../api/axios.js";
 import { setCreatorCourseData } from "../../redux/courseSlice";
 
 function Courses() {
@@ -17,9 +17,7 @@ function Courses() {
   useEffect(() => {
     const creatorCourses = async () => {
       try {
-        const result = await axios.get(serverUrl + "/api/course/getcreator", {
-          withCredentials: true,
-        });
+        const result = await API.get("/course/getcreator");
         dispatch(setCreatorCourseData(result.data.data));
       } catch (error) {
         console.log(error);
