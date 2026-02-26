@@ -16,7 +16,7 @@ function CreateCourses() {
     setLoading(true);
     try {
       // 2. Included subtitle in the API request body
-      const result = await API.post("/course/create", { 
+      const result = await API.post("/course/", { 
         title, 
         category, 
         subtitle 

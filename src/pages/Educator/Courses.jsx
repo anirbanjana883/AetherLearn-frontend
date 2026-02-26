@@ -17,7 +17,7 @@ function Courses() {
   useEffect(() => {
     const creatorCourses = async () => {
       try {
-        const result = await API.get("/course/getcreator");
+        const result = await API.get("/course/creator");
         dispatch(setCreatorCourseData(result.data.data));
       } catch (error) {
         console.log(error);
