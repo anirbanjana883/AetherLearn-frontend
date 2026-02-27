@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit ,FaTrash } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -12,13 +12,13 @@ import { toast } from "react-toastify";
 function CreateLecture() {
   const navigate = useNavigate();
   // Destructure BOTH courseId and sectionId from the URL
-  const { courseId, sectionId } = useParams(); 
+  const { courseId, sectionId } = useParams();
 
   const [currentSectionName, setCurrentSectionName] = useState("");
-  
+
   const [lectureTitle, setLectureTitle] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   const dispatch = useDispatch();
   const { lectureData } = useSelector((state) => state.lecture);
 
@@ -26,26 +26,26 @@ function CreateLecture() {
 
   const handleCreateLecture = async () => {
     if (!lectureTitle.trim()) return toast.error("Title is required");
-    
+
     setLoading(true);
     try {
       // Updated URL to include sectionId as per your backend router
-      const result = await API.post(`/course/${sectionId}/lecture`,
-        { lectureTitle }
+      const result = await API.post(
+        `/course/${courseId}/sections/${sectionId}/lectures`,
+        { lectureTitle },
       );
-      
+
       // Accessing the new lecture from your backend response structure
       const newLecture = result.data.data;
-      
+
       const currentLectures = Array.isArray(lectureData) ? lectureData : [];
       dispatch(setLectureData([...currentLectures, newLecture]));
-      
+
       toast.success("Lecture created! Now upload the video.");
       setLectureTitle("");
-      
+
       // Optional: Auto-navigate to the edit page to upload video immediately
       // navigate(`/editlecture/${courseId}/${newLecture._id}`);
-      
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.message || "Failed to create lecture");
@@ -53,36 +53,52 @@ function CreateLecture() {
       setLoading(false);
     }
   };
+  const handleRemoveLecture = async (lectureId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure? This will permanently delete the video and metadata from the cloud.",
+    );
+    if (!confirmDelete) return;
 
-useEffect(() => {
-  const getCourseLectures = async () => {
     try {
-      const result = await API.get(`/course/${courseId}/lectures`);
-      
-      const sections = result.data.data.sections; 
-      
-      if (sections) {
-        const currentSection = sections.find(s => s._id === sectionId);
+      await API.delete(`/course/sections/${sectionId}/lectures/${lectureId}`);
 
-        setCurrentSectionName(currentSection.sectionTitle);
-        // Only set the lectures that belong to THIS section
-        dispatch(setLectureData(currentSection?.lectures || []));
-      } else {
-        // Fallback if backend structure is different
-        dispatch(setLectureData(result.data.data.lectures || []));
-      }
+      const updatedList = lectureData.filter((l) => l._id !== lectureId);
+      dispatch(setLectureData(updatedList));
+
+      toast.success("Lecture purged from system.");
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.error("Removal Error:", error);
+      toast.error(error.response?.data?.message || "Failed to remove lecture");
     }
   };
-  
-  if (courseId && sectionId) getCourseLectures();
-}, [courseId, sectionId, dispatch]);
+  useEffect(() => {
+    const getCourseLectures = async () => {
+      try {
+        const result = await API.get(`/course/${courseId}/lectures`);
+
+        const sections = result.data.data.sections;
+
+        if (sections) {
+          const currentSection = sections.find((s) => s._id === sectionId);
+
+          setCurrentSectionName(currentSection.sectionTitle);
+          // Only set the lectures that belong to THIS section
+          dispatch(setLectureData(currentSection?.lectures || []));
+        } else {
+          // Fallback if backend structure is different
+          dispatch(setLectureData(result.data.data.lectures || []));
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    };
+
+    if (courseId && sectionId) getCourseLectures();
+  }, [courseId, sectionId, dispatch]);
 
   return (
     <div className="min-h-screen bg-[#030712] text-white flex items-center justify-center p-4">
       <div className="bg-[#0A0F1C] w-full max-w-2xl rounded-2xl shadow-[0_0_20px_rgba(37,99,235,0.4)] border border-blue-500/40 p-8 hover:shadow-[0_0_35px_rgba(37,99,235,0.7)] transition-all duration-500">
-        
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <FaArrowLeftLong
@@ -95,11 +111,9 @@ useEffect(() => {
             </h1>
             <p className="text-xs text-blue-500 mt-1 uppercase tracking-widest">
               Section ID: {sectionId?.slice(-6)}
-              
             </p>
             <p className="text-xs text-blue-500 mt-1 uppercase tracking-widest">
               Section NAME: {currentSectionName}
-              
             </p>
           </div>
         </div>
@@ -113,7 +127,7 @@ useEffect(() => {
               className="w-full bg-[#030712] border border-blue-500/20 text-blue-100 rounded-xl px-5 py-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-gray-600"
               value={lectureTitle}
               onChange={(e) => setLectureTitle(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleCreateLecture()}
+              onKeyPress={(e) => e.key === "Enter" && handleCreateLecture()}
             />
           </div>
 
@@ -122,14 +136,20 @@ useEffect(() => {
             onClick={handleCreateLecture}
             disabled={loading || !lectureTitle.trim()}
           >
-            {loading ? <ClipLoader color="white" size={20} /> : "INITIALIZE NEW LECTURE"}
+            {loading ? (
+              <ClipLoader color="white" size={20} />
+            ) : (
+              "INITIALIZE NEW LECTURE"
+            )}
           </button>
         </div>
 
         {/* Divider */}
         <div className="flex items-center gap-4 mb-6">
           <div className="h-[1px] flex-1 bg-blue-900/30"></div>
-          <span className="text-[10px] font-bold text-blue-800 uppercase tracking-[0.3em]">Existing Curriculum</span>
+          <span className="text-[10px] font-bold text-blue-800 uppercase tracking-[0.3em]">
+            Existing Curriculum
+          </span>
           <div className="h-[1px] flex-1 bg-blue-900/30"></div>
         </div>
 
@@ -139,28 +159,67 @@ useEffect(() => {
             lectureData.map((lecture, index) => (
               <div
                 key={lecture._id}
-                className="group bg-[#0B1324]/50 rounded-xl flex justify-between items-center p-4 border border-blue-900/30 hover:border-blue-500/50 hover:bg-[#0B1324] transition-all duration-300"
+                className="group bg-[#0B1324]/50 rounded-xl flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 border border-blue-900/30 hover:border-blue-500/50 hover:bg-[#0B1324] transition-all duration-300 gap-4"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-8 h-8 rounded-lg bg-blue-900/20 flex items-center justify-center text-blue-500 font-mono text-xs border border-blue-800/30">
                     {index + 1}
                   </div>
-                  <span className="text-sm text-gray-300 group-hover:text-blue-200 transition-colors">
-                    {lecture?.lectureTitle}
-                  </span>
+                  <div>
+                    <span className="text-sm text-gray-300 group-hover:text-blue-200 transition-colors block">
+                      {lecture?.lectureTitle}
+                    </span>
+
+                    {/* 🟢 NEW: Status Badge Logic */}
+                    <div className="flex items-center gap-2 mt-1">
+                      <span
+                        className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter border ${
+                          lecture.status === "READY"
+                            ? "bg-green-500/10 text-green-500 border-green-500/20"
+                            : lecture.status === "PROCESSING"
+                              ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/20 animate-pulse"
+                              : lecture.status === "FAILED"
+                                ? "bg-red-500/10 text-red-500 border-red-500/20"
+                                : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                        }`}
+                      >
+                        {lecture.status || "UPLOADING"}
+                      </span>
+
+                      {lecture.isPreviewFree && (
+                        <span className="text-[9px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full font-bold uppercase">
+                          FREE PREVIEW
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                
-                <button
-                  onClick={() => navigate(`/editlecture/${courseId}/${lecture._id}`)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-900/20 text-blue-400 text-xs font-bold hover:bg-blue-600 hover:text-white transition-all"
-                >
-                  <FaEdit /> EDIT / UPLOAD
-                </button>
+
+                <div className="flex items-center gap-2 self-end sm:self-center">
+                  <button
+                    onClick={() =>
+                      navigate(`/editlecture/${courseId}/${lecture._id}`)
+                    }
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-900/20 text-blue-400 text-xs font-bold hover:bg-blue-600 hover:text-white transition-all"
+                  >
+                    <FaEdit /> {lecture.status === "READY" ? "EDIT" : "UPLOAD"}
+                  </button>
+
+                  <button
+                    onClick={() => handleRemoveLecture(lecture._id)}
+                    className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all border border-red-500/20 group-hover:border-red-500/50"
+                    title="Delete Lecture"
+                  >
+                    <FaTrash size={14} />
+                  </button>
+                </div>
               </div>
             ))
           ) : (
             <div className="text-center py-10">
-              <p className="text-gray-600 italic text-sm">No lectures found in this section.</p>
+              <p className="text-gray-600 italic text-sm uppercase tracking-widest">
+                CURRICULUM_VOID: No Lectures Found
+              </p>
             </div>
           )}
         </div>

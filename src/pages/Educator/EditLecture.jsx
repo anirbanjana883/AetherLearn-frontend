@@ -7,10 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLectureData } from "../../redux/lectureSlice";
 import ClipLoader from "react-spinners/ClipLoader";
 
-const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks to stay safe and fast
+const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks matching your controller expectations
 
 const NeonProgressBar = ({ progress, label }) => (
-  <div className="w-full space-y-2 mt-4">
+  <div className="w-full space-y-2 mt-4 animate-in fade-in duration-500">
     <div className="flex justify-between items-end">
       <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest animate-pulse">
         {label}
@@ -47,7 +47,8 @@ function EditLecture() {
   const uploadVideoInChunks = async (file) => {
     try {
       setStatusMessage("SYSTEM: INITIALIZING UPLINK...");
-      const initRes = await API.post("/course/upload/initialize", { lectureId });
+      // Matches courseRouter.post("/uploads/init", ...)
+      const initRes = await API.post("/course/uploads/init", { lectureId });
       const { uploadId } = initRes.data.data;
 
       const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
@@ -58,19 +59,21 @@ function EditLecture() {
         const chunk = file.slice(start, end);
 
         const formData = new FormData();
-        // MATCHES YOUR BACKEND: chunkMulter.single("chunk")
+        // Key "chunk" matches your backend: chunkMulter.single("chunk")
         formData.append("chunk", chunk); 
         formData.append("uploadId", uploadId);
         formData.append("chunkIndex", i);
 
         setStatusMessage(`TRANSFERRING PACKET ${i + 1}/${totalChunks}`);
-        await API.post("/course/upload/chunk", formData);
+        // Matches courseRouter.post("/uploads/chunk", ...)
+        await API.post("/course/uploads/chunk", formData);
         
         setUploadProgress(Math.round(((i + 1) / totalChunks) * 100));
       }
 
       setStatusMessage("SYSTEM: STITCHING & HANDSHAKE...");
-      await API.post("/course/upload/complete", {
+      // Matches courseRouter.post("/uploads/complete", ...)
+      await API.post("/course/uploads/complete", {
         uploadId,
         totalChunks,
         lectureId
@@ -79,7 +82,7 @@ function EditLecture() {
       return true;
     } catch (error) {
       console.error("Uplink Error:", error);
-      throw new Error("Data transmission failed. Check connection.");
+      throw new Error("Video transmission failed. Check server disk space.");
     }
   };
 
@@ -88,25 +91,26 @@ function EditLecture() {
     setLoading(true);
 
     try {
-      // 1. Upload Video if selected
+      // 1. Chunked Video Upload (if file selected)
       if (videoFile) {
         await uploadVideoInChunks(videoFile);
       }
 
-      // 2. Update Metadata (Title, Preview status)
-      const res = await API.post(`/course/editlecture/${lectureId}`, {
+      // 2. Metadata Update (Title, Preview Status)
+      // Matches courseRouter.patch("/lectures/:lectureId", ...)
+      const res = await API.patch(`/course/lectures/${lectureId}`, {
         lectureTitle,
         isPreviewFree,
       });
 
-      // 3. Update Redux
+      // 3. Update Redux State
       const updatedLectures = lectureData.map((l) =>
         l._id === lectureId ? { ...l, ...res.data.data } : l
       );
       dispatch(setLectureData(updatedLectures));
 
-      toast.success("Protocol Successful: Lecture Updated");
-      navigate(-1); // Goes back to the CreateLecture/List page
+      toast.success("Update Successful: Background processing started.");
+      navigate(-1); 
     } catch (error) {
       toast.error(error.message || "Update Failed");
     } finally {
@@ -115,6 +119,8 @@ function EditLecture() {
       setStatusMessage("");
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-[#030712] text-white flex items-center justify-center p-4">
@@ -137,26 +143,27 @@ function EditLecture() {
               type="text"
               value={lectureTitle}
               onChange={(e) => setLectureTitle(e.target.value)}
-              className="w-full bg-[#030712] border border-blue-900/50 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition-all placeholder:text-gray-700"
-              placeholder="Enter Lecture Title"
+              className="w-full bg-[#030712] border border-blue-900/50 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition-all placeholder:text-gray-700 font-medium"
+              placeholder="e.g. Modular Architecture"
             />
           </div>
 
           <div className="p-6 border border-dashed border-blue-900/50 rounded-xl bg-blue-950/5">
-            <label className="block text-[10px] font-bold text-blue-300 uppercase mb-3 tracking-widest text-center">Video Uplink (Optional)</label>
+            <label className="block text-[10px] font-bold text-blue-300 uppercase mb-3 tracking-widest text-center">Video Uplink (Replacer)</label>
             <input
               type="file"
               accept="video/*"
               onChange={(e) => setVideoFile(e.target.files[0])}
               className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer"
             />
+            <p className="text-[10px] text-gray-600 mt-2 text-center italic">Leave empty to keep existing video.</p>
           </div>
 
           {loading && videoFile && (
             <NeonProgressBar progress={uploadProgress} label={statusMessage} />
           )}
 
-          <div className="flex items-center gap-3 py-2">
+          <div className="flex items-center gap-3 py-2 bg-[#0d1425] p-3 rounded-lg border border-blue-900/20">
             <input
               type="checkbox"
               id="isFree"
@@ -164,8 +171,8 @@ function EditLecture() {
               onChange={() => setIsPreviewFree(!isPreviewFree)}
               className="h-5 w-5 accent-blue-500 bg-gray-900 border-blue-900 rounded"
             />
-            <label htmlFor="isFree" className="text-sm text-blue-200 cursor-pointer select-none">
-              Mark as Free Preview
+            <label htmlFor="isFree" className="text-sm text-blue-200 cursor-pointer select-none font-semibold">
+              Enable Free Preview for this lecture
             </label>
           </div>
 
@@ -174,7 +181,7 @@ function EditLecture() {
             onClick={handleEditLecture}
             className="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs tracking-[0.2em] transition-all shadow-lg shadow-blue-900/20 flex items-center justify-center gap-3 disabled:opacity-50"
           >
-            {loading ? <ClipLoader size={20} color="white" /> : "UPDATE_LECTURE_CORE"}
+            {loading ? <ClipLoader size={20} color="white" /> : "EXECUTE_UPDATE_SEQUENCE"}
           </button>
         </div>
       </div>
