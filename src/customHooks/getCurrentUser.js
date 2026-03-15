@@ -4,6 +4,7 @@ import axios from "axios";
 import { serverUrl } from "../App";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../redux/userSlice";
+import API from "../api/axios";
 
 const getCurrentUser = () => {
   const dispatch = useDispatch();
@@ -12,9 +13,7 @@ const getCurrentUser = () => {
     // if (userData === null) return;
     const fetchUser = async () => {
       try {
-        const result = await axios.get(serverUrl + "/api/user/getcurrentuser", {
-          withCredentials: true,
-        });
+        const result = await API.get("/user/me");
         // console.log(result.data)
         dispatch(setUserData(result.data.data));
       } catch (error) {

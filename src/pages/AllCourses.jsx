@@ -3,16 +3,16 @@ import Nav from "../component/Nav";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import aiimg from "../assets/SearchAi_bl.png";
-import { useDispatch, useSelector } from "react-redux"; // 👈 Import Dispatch
+import { useDispatch, useSelector } from "react-redux"; 
 import Card from "../component/Card";
 import { FaFilter, FaTimes, FaGhost } from "react-icons/fa";
-import axios from "axios"; // 👈 Import Axios
-import API, { serverUrl } from "../api/axios.js"; // 👈 Import Server URL
-import { setCourseData } from "../redux/courseSlice"; // 👈 Import Action
+import axios from "axios"; 
+import API, { serverUrl } from "../api/axios.js"; 
+import { setCourseData } from "../redux/courseSlice"; 
 
 function AllCourses() {
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // 👈 Init Dispatch
+  const dispatch = useDispatch();
   const { courseData } = useSelector((state) => state.course);
   
   const [category, setCategory] = useState([]);
@@ -20,7 +20,7 @@ function AllCourses() {
   const [visibleSideBar, setVisibleSideBar] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // ✅ 1. FETCH LOGIC (Now lives inside the page)
+  //  FETCH LOGIC (Now lives inside the page)
   useEffect(() => {
     const fetchPublishedCourses = async () => {
       setLoading(true);
@@ -31,7 +31,7 @@ function AllCourses() {
         // Debug: See if it comes from Cache or DB
         console.log("Fetched Courses:", result.data);
 
-        // ✅ Correctly extracting the array
+        //  Correctly extracting the array
         if (result.data.success) {
            dispatch(setCourseData(result.data.data));
         }
@@ -42,8 +42,6 @@ function AllCourses() {
       }
     };
 
-    // Fetch only if we don't have data yet (Optional optimization)
-    // Or fetch every time to ensure freshness. Let's fetch every time for now.
     fetchPublishedCourses();
   }, [dispatch]);
 
@@ -62,14 +60,31 @@ function AllCourses() {
     );
   };
 
-  // ✅ 2. FILTER LOGIC
+  //  FILTER LOGIC
+// 🛠️ UPDATED FILTER LOGIC
   useEffect(() => {
     // Safety Check: Ensure courseData is an array
     let courseCopy = Array.isArray(courseData) ? [...courseData] : [];
     
+    // Debug log to see exactly what is in your Redux state
+    console.log("Current Course Data in Redux:", courseCopy);
+    console.log("Currently Selected Categories:", category);
+
     if (category.length > 0) {
-      courseCopy = courseCopy.filter((c) => category.includes(c.category));
+      courseCopy = courseCopy.filter((c) => {
+        // Protect against courses that might have a missing category field
+        if (!c.category) return false;
+
+        // Convert backend category to lowercase and remove spaces
+        const backendCategory = c.category.toLowerCase().trim();
+
+        // Check if our selected categories array contains this backend category
+        return category.some((selectedCat) => 
+          selectedCat.toLowerCase().trim() === backendCategory
+        );
+      });
     }
+    
     setFilterCourses(courseCopy);
   }, [category, courseData]);
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { serverUrl } from "../api/axios.js";
+import API, { serverUrl } from "../api/axios.js";
 import { setUserData } from "../redux/userSlice";
 import { toast } from "react-toastify";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -12,7 +12,7 @@ function EditProfile() {
   const navigate = useNavigate();
   const { userData } = useSelector((state) => state.user);
   
-  // 🛡️ SAFETY FIX: Added optional chaining (?.) to prevent crashes on refresh
+
   const [name, setName] = useState(userData?.name || "");
   const [description, setDescription] = useState(userData?.description || "");
   
@@ -28,11 +28,8 @@ function EditProfile() {
       formData.append("description", description);
       if (photoUrl) formData.append("photoUrl", photoUrl);
 
-      const result = await axios.post(`${serverUrl}/api/user/profile`, formData, {
-        withCredentials: true,
-      });
+      const result = await API.patch(`/user/me`, formData, );
 
-      // ✅ FIX: Extract the user object from the data wrapper
       dispatch(setUserData(result.data.data));
       
       setLoading(false);

@@ -14,7 +14,7 @@ function CardPge() {
     const fetchCoursesIfNeeded = async () => {
       if (!courseData || courseData.length === 0) {
         try {
-          const result = await API.get("/course/getpublished");
+          const result = await API.get("/course/");
 
           if (result.data.success) {
             dispatch(setCourseData(result.data.data));

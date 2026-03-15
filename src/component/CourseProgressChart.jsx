@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { serverUrl } from "../api/axios.js";
+import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 
 // A custom component for the tooltip to match your futuristic theme
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900/60 backdrop-blur-md border border-blue-500/30 rounded-lg p-3 shadow-lg">
+      <div className="bg-slate-900/80 backdrop-blur-md border border-blue-500/50 rounded-lg p-3 shadow-lg">
         <p className="font-bold text-cyan-300">{`${label}`}</p>
         <p className="text-white">{`Progress: ${payload[0].value}%`}</p>
       </div>
@@ -16,41 +14,22 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-function CourseProgressChart() {
-  const [chartData, setChartData] = useState([]);
-
-  useEffect(() => {
-    const fetchCourseProgress = async () => {
-      try {
-        const result = await axios.get(`${serverUrl}/api/stats/course-progress`, { withCredentials: true });
-        
-        // 🛡️ SAFETY CHECK: Ensure data exists and is an array before sorting
-        const rawData = result.data.data;
-        
-        if (Array.isArray(rawData) && rawData.length > 0) {
-           const sortedData = rawData.sort((a, b) => b.progress - a.progress);
-           setChartData(sortedData);
-        } else {
-           setChartData([]); // Handle empty state safely
-        }
-
-      } catch (error) {
-        console.error("Failed to fetch course progress data", error);
-        setChartData([]);
-      }
-    };
-    fetchCourseProgress();
-  }, []);
+// 🚨 Accept 'data' as a prop instead of fetching it here
+function CourseProgressChart({ data = [] }) {
+  
+  // Sort the data so the highest progress is at the top
+  const sortedData = [...data].sort((a, b) => b.progress - a.progress);
 
   return (
-    <div className="bg-slate-900/40 backdrop-blur-md border border-blue-500/40 shadow-[0_0_30px_rgba(37,99,235,0.3)] p-6 transition-all duration-500 hover:shadow-[0_0_45px_rgba(37,99,235,0.6)] h-[450px] rounded-2xl">
+    // 🧹 Tweaked to rounded-3xl to perfectly match your other dashboard panels
+    <div className="bg-slate-900/40 backdrop-blur-md border border-blue-500/40 shadow-[0_0_30px_rgba(37,99,235,0.3)] p-6 transition-all duration-500 hover:shadow-[0_0_45px_rgba(37,99,235,0.6)] h-[450px] rounded-3xl">
       <h3 className="text-xl font-bold text-blue-300 mb-6">Course Activity Overview</h3>
       
       {/* Handle Empty State UI */}
-      {chartData.length > 0 ? (
+      {sortedData.length > 0 ? (
         <ResponsiveContainer width="100%" height="90%">
           <BarChart
-            data={chartData}
+            data={sortedData}
             layout="vertical"
             margin={{ top: 5, right: 40, left: 20, bottom: 20 }}
           >
@@ -61,7 +40,7 @@ function CourseProgressChart() {
               </linearGradient>
             </defs>
             
-            <CartesianGrid stroke="rgba(59, 130, 246, 0.1)" strokeDasharray="3 3" />
+            <CartesianGrid stroke="rgba(59, 130, 246, 0.1)" strokeDasharray="3 3" horizontal={true} vertical={false} />
             <XAxis 
               type="number" 
               domain={[0, 100]} 
@@ -77,19 +56,21 @@ function CourseProgressChart() {
               tick={{ fill: '#e2e8f0', fontSize: 12, width: 90 }} 
               tickFormatter={(value) => value.length > 12 ? `${value.substring(0, 12)}...` : value}
               interval={0}
+              axisLine={false}
+              tickLine={false}
             />
             <Tooltip
               cursor={{ fill: 'rgba(37, 99, 235, 0.1)' }}
               content={<CustomTooltip />}
               animationDuration={300}
             />
-            <Bar dataKey="progress" fill="url(#barGradient)" barSize={20} radius={[0, 5, 5, 0]}>
+            <Bar dataKey="progress" fill="url(#barGradient)" barSize={20} radius={[0, 4, 4, 0]}>
               <LabelList dataKey="progress" position="right" formatter={(value) => `${value}%`} style={{ fill: '#e2e8f0', fontSize: 12, fontWeight: 'bold' }} />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       ) : (
-        <div className="flex items-center justify-center h-[80%] text-gray-400">
+        <div className="flex items-center justify-center h-[80%] text-slate-500 italic">
            No course progress available yet.
         </div>
       )}

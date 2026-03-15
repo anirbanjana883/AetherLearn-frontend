@@ -10,7 +10,6 @@ import Login from './pages/Login'
 import Profile from './pages/Profile'
 import ForgetPassowrd from './pages/ForgetPassowrd'
 import EditProfile from './pages/EditProfile'
-import Dashboard from './pages/Educator/Dashboard'
 import Courses from './pages/Educator/Courses'
 import EditCourse from './pages/Educator/EditCourse'
 import CreateCourses from './pages/Educator/CreateCourses'
@@ -24,6 +23,8 @@ import MyEnrolledCourse from './pages/MyEnrolledCourse'
 import SearchWithAi from './pages/searchWithAi'
 import StudentDashboard from './pages/StudentDashboard'
 import ProtectedRoute from './routes/ProtectedRoute'
+import EducatorDashboard from './pages/Educator/EducatorDashboard'
+import CourseAnalytics from './pages/Educator/CourseAnalytics'
 
 function App() {
   const { userData } = useSelector(state => state.user);
@@ -54,7 +55,8 @@ function App() {
         }/>
 
         {/* Educator Specific */}
-        <Route path='/dashboard' element={<ProtectedRoute role="educator"><Dashboard/></ProtectedRoute>}/>
+        <Route path='/dashboard' element={<ProtectedRoute role="educator"><EducatorDashboard/></ProtectedRoute>}/>
+        <Route path='/analytics/:courseId' element={<ProtectedRoute role="educator"><CourseAnalytics/></ProtectedRoute>}/>
         <Route path='/courses' element={<ProtectedRoute role="educator"><Courses/></ProtectedRoute>}/>
         <Route path='/createcourse' element={<ProtectedRoute role="educator"><CreateCourses/></ProtectedRoute>}/>
         <Route path='/editcourse/:courseId' element={<ProtectedRoute role="educator"><EditCourse/></ProtectedRoute>}/>

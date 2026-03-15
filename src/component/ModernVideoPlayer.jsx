@@ -1,17 +1,16 @@
 import React, { useRef, useState, useEffect } from "react";
 import {
-  FaPlay,
-  FaPause,
-  FaVolumeUp,
-  FaVolumeMute,
-  FaExpand,
-  FaRedo,
-  FaExclamationTriangle,
+  FaPlay, FaPause, FaVolumeUp, FaVolumeMute,
+  FaExpand, FaRedo, FaExclamationTriangle,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
+import API from "../api/axios.js"; // 🚨 ADDED: Import your API instance
 
-function ModernVideoPlayer({ src, onEnded }) {
+// 🚨 ADDED: courseId and lectureId props
+function ModernVideoPlayer({ src, courseId, lectureId, onEnded }) {
   const videoRef = useRef(null);
+  const lastLoggedTimeRef = useRef(0); // 🚨 Tracks exact time for accurate deltas
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(1);
@@ -24,17 +23,52 @@ function ModernVideoPlayer({ src, onEnded }) {
   const [controlsVisible, setControlsVisible] = useState(true);
   const [videoEnded, setVideoEnded] = useState(false);
 
+  // --- 💓 FAANG HEARTBEAT TELEMETRY ---
+  useEffect(() => {
+    let heartbeat;
+    // Only run interval if video is actively playing and we have IDs
+    if (isPlaying && courseId && lectureId) {
+      heartbeat = setInterval(() => {
+        const currentVideoTime = videoRef.current?.currentTime || 0;
+        const delta = currentVideoTime - lastLoggedTimeRef.current;
+
+        // Ensure delta is positive and less than 6 seconds (prevents Seek Cheating)
+        if (delta > 0 && delta <= 6) {
+          // 1. Sync Student Progress (Absolute Time to Redis)
+          API.post("/progress/save", { 
+            courseId, 
+            lectureId, 
+            watchTime: currentVideoTime 
+          }).catch(() => {}); // Silent catch
+
+          // 2. Track Educator Analytics (Watch Time Delta to Redis)
+          API.post(`/analytics/${courseId}/telemetry`, { 
+            courseId, 
+            lectureId, 
+            watchTimeDelta: delta 
+          }).catch(() => {}); // Silent catch
+        }
+        
+        // Update baseline for the next heartbeat
+        lastLoggedTimeRef.current = currentVideoTime;
+      }, 5000); // Fires every 5 seconds
+    }
+
+    return () => clearInterval(heartbeat);
+  }, [isPlaying, courseId, lectureId]);
+
+  // Reset baseline when source changes
+  useEffect(() => {
+    setHasError(false);
+    setIsBuffering(true);
+    lastLoggedTimeRef.current = 0; 
+  }, [src]);
+
   const handleError = () => {
     setIsBuffering(false);
     setHasError(true);
     toast.error("Could not load video. The source may be invalid or blocked.");
-    console.error("Video Error: Failed to load the video source.");
   };
-
-  useEffect(() => {
-    setHasError(false);
-    setIsBuffering(true);
-  }, [src]);
 
   const formatTime = (time) => {
     if (!time || isNaN(time)) return "0:00";
@@ -73,6 +107,10 @@ function ModernVideoPlayer({ src, onEnded }) {
     const newTime = (e.target.value / 100) * video.duration;
     video.currentTime = newTime;
     setProgress(e.target.value);
+    
+    // 🚨 ANTI-CHEAT: Reset baseline so they don't generate fake watch time when skipping
+    lastLoggedTimeRef.current = newTime;
+    
     if (videoEnded) setVideoEnded(false);
   };
 
@@ -98,13 +136,17 @@ function ModernVideoPlayer({ src, onEnded }) {
     try {
       if (!document.fullscreenElement) {
         await container.requestFullscreen();
-        await screen.orientation.lock("landscape");
+        if (screen.orientation && screen.orientation.lock) {
+            await screen.orientation.lock("landscape").catch(() => {});
+        }
       } else {
         await document.exitFullscreen();
-        screen.orientation.unlock();
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        }
       }
     } catch (error) {
-      console.error("Fullscreen or orientation lock failed:", error);
+      console.error("Fullscreen failed:", error);
     }
   };
 
@@ -123,9 +165,20 @@ function ModernVideoPlayer({ src, onEnded }) {
   };
   const handlePause = () => setIsPlaying(false);
 
-  const handleEnded = () => {
+  // 🚨 ADDED: Auto-complete when video finishes
+  const handleEnded = async () => {
     setIsPlaying(false);
     setVideoEnded(true);
+    
+    try {
+      if (courseId && lectureId) {
+        await API.post('/progress/complete', { courseId, lectureId });
+        toast.success("Lecture Complete! 🎉");
+      }
+    } catch (error) {
+      console.error("Failed to mark complete:", error);
+    }
+
     if (onEnded) onEnded();
   };
 
@@ -137,15 +190,11 @@ function ModernVideoPlayer({ src, onEnded }) {
     return () => clearTimeout(timer);
   }, [controlsVisible, isPlaying]);
 
-  const handleContainerClick = () => {
-    setControlsVisible(true);
-  };
-
   return (
     <div
       className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-xl group"
       onMouseMove={() => setControlsVisible(true)}
-      onClick={handleContainerClick}
+      onClick={() => setControlsVisible(true)}
     >
       <video
         ref={videoRef}
@@ -171,7 +220,6 @@ function ModernVideoPlayer({ src, onEnded }) {
         </div>
       )}
 
-      {/* --- THIS IS THE CORRECTED SECTION --- */}
       {/* Center Play/Pause/Replay Button */}
       <div
         className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 pointer-events-none
@@ -180,12 +228,10 @@ function ModernVideoPlayer({ src, onEnded }) {
         <button
           onClick={(e) => { e.stopPropagation(); togglePlay(); }}
           className="p-4 bg-black/40 backdrop-blur-sm rounded-full text-white text-4xl transition-transform hover:scale-110 focus:outline-none pointer-events-auto"
-          aria-label={videoEnded ? "Replay" : isPlaying ? "Pause" : "Play"}
         >
           {videoEnded ? <FaRedo /> : <FaPlay />}
         </button>
       </div>
-      {/* ------------------------------------ */}
 
       {/* CONTROLS */}
       {!hasError && (
@@ -215,7 +261,7 @@ function ModernVideoPlayer({ src, onEnded }) {
                   type="range" min="0" max="1" step="0.05"
                   value={isMuted ? 0 : volume}
                   onChange={handleVolumeChange}
-                  className="w-20 accent-cyan-500 cursor-pointer"
+                  className="w-20 accent-cyan-500 cursor-pointer hidden sm:block"
                 />
               </div>
               <span className="text-xs text-slate-300 font-mono">

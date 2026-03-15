@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     dispatch(setLoader(true));
     try {
       // Calling your existing backend endpoint
-      const { data } = await API.get("/user/getcurrentuser");
+      const { data } = await API.get("/user/me");
       if (data.success) {
         dispatch(setUserData(data.data));
       }
